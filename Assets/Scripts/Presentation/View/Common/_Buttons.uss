@@ -1,0 +1,110 @@
+/* =========================== */
+/* === 共通ボタンスタイル === */
+/* =========================== */
+
+/* ほとんどのボタンの基本スタイル */
+.button-base {
+    border-radius: 50px;
+    transition-property: background-color, border-color, color, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+    font-size: 30px;
+    -unity-text-align: middle-center; /* テキスト中央揃え */
+    cursor: link; /* インタラクティブであることを示す */
+    flex-shrink: 0; /* flexレイアウトで縮小しないようにする */
+}
+
+/* プライマリアクションボタン (例: ログイン, 保存) */
+.primary-button {
+    /* button-baseから継承 */
+    height: 100px;
+    background-color: rgb(59, 130, 246);
+    border-width: 0;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+}
+
+.primary-button:hover {
+    background-color: rgb(37, 99, 235);
+}
+
+.primary-button:active {
+    background-color: rgb(30, 80, 200);
+    scale: 0.97; /* 一貫したアクティブ時のスケール */
+}
+
+/* セカンダリアクションボタン (例: ゲストとして続行) */
+.secondary-button {
+    /* button-baseから継承 */
+    height: 100px;
+    background-color: rgb(255, 255, 255);
+    border-width: 2px;
+    border-color: rgb(59, 130, 246);
+    color: rgb(59, 130, 246);
+}
+
+.secondary-button:hover {
+    background-color: rgb(240, 247, 255);
+    border-color: rgb(37, 99, 235);
+}
+
+.secondary-button:active {
+    scale: 0.97;
+    background-color: rgb(230, 242, 250);
+    border-color: rgb(30, 80, 200);
+}
+
+/* キャンセルボタン (通常モーダル内) */
+.cancel-button {
+    /* button-baseから継承 */
+    /* width: 40%; */ /* 代わりに flex-grow/basis を使用 */
+    height: 100px;
+    background-color: transparent;
+    border-width: 2px;
+    border-color: rgb(150, 150, 150);
+    color: rgb(80, 80, 80);
+}
+
+.cancel-button:hover {
+    background-color: rgba(200, 200, 200, 0.2);
+    border-color: rgb(100, 100, 100);
+}
+
+.cancel-button:active {
+    background-color: rgba(190, 190, 190, 0.3);
+    scale: 0.97;
+    border-color: rgb(80, 80, 80);
+}
+
+/* Form Elements section buttons - added for completeness */
+.button-primary { /* Note: Duplicate definition exists, might need consolidation later */
+    font-size: 16px;
+    padding: 10px 20px;
+    color: white;
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 5px;
+    cursor: link;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.button-primary:hover {
+    background-color: #0056b3;
+}
+
+.button-secondary { /* Note: Duplicate definition exists, might need consolidation later */
+    font-size: 16px;
+    padding: 10px 20px;
+    color: #007bff;
+    background-color: white;
+    border-color: #007bff;
+    border-width: 1px;
+    border-radius: 5px;
+    cursor: link;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.button-secondary:hover {
+    background-color: #e2e6ea;
+    color: #0056b3;
+}

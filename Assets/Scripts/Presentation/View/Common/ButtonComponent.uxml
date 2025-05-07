@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- スタイルシート -->
+    <!-- .button-base, .primary-button, .secondary-button, .cancel-button を定義します -->
+    <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
+
+    <!-- === ボタンコンポーネント ルート === -->
+    <!-- このテンプレートは単一のボタンタイプを表す可能性が高いです。 -->
+    <!-- インスタンス化するUXMLで必要に応じて 'name', 'text', 'class' を上書きする必要があります。 -->
+    <!-- 例: デフォルトはプライマリボタン -->
+    <Button name="button-component" text="デフォルトボタン" class="button-base primary-button" />
+
+    <!-- 他のボタンタイプ (secondary, cancel) を使用するには、 -->
+    <!-- このテンプレートをインスタンス化する際にクラスを上書きする必要があります。例: -->
+    <!-- <Instance template="ButtonComponent" name="my-cancel-button"> -->
+    <!--    <AttributeOverrides element-name="button-component" text="キャンセル" class="button-base cancel-button" /> -->
+    <!-- </Instance> -->
+</UXML>

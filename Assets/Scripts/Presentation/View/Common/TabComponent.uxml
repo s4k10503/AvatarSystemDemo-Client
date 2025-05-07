@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- スタイルシート -->
+    <!-- .tab-container と .tab-button のスタイルを定義します -->
+    <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
+
+    <!-- === タブコンポーネント ルート === -->
+    <!-- このコンテナはタブボタンを保持します -->
+    <VisualElement name="tab-container" class="tab-container">
+        <!-- タブボタン (通常は class="tab-button" を持つ Button 要素) は -->
+        <!-- このテンプレートをインスタンス化する際に、この VisualElement 内に追加する必要があります。 -->
+        <!-- LoginModal.uxml の例: -->
+        <!-- <Instance template="TabComponent" name="login-tab-container"> -->
+        <!--     <VisualElement name="tab-container" class="tab-container"> -->
+        <!--         <Button text="ログイン" name="login-tab" class="tab-button tab-active" /> -->
+        <!--         <Button text="新規登録" name="register-tab" class="tab-button" /> -->
+        <!--     </VisualElement> -->
+        <!-- </Instance> -->
+    </VisualElement>
+</UXML>

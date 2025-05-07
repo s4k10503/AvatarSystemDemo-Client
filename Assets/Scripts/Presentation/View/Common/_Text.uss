@@ -1,0 +1,56 @@
+/* タイトルの基本スタイル */
+.title-base {
+    -unity-font-style: bold;
+    color: rgb(33, 33, 33);
+    -unity-text-align: middle-center;
+    margin-bottom: 30px; /* デフォルトのマージン */
+}
+
+/* エラーメッセージラベルの共通スタイル */
+.error-label {
+    color: rgb(220, 53, 69);
+    -unity-text-align: middle-center;
+    white-space: normal; /* 折り返しを許可 */
+    padding: 10px 0;
+    min-height: 25px; /* スペース確保 */
+    display: none; /* デフォルトで非表示 */
+    font-size: 22px;
+    margin-top: 5px;
+    margin-bottom: 15px; /* 下部にマージン追加 */
+}
+
+.error-message {
+    color: red;
+    -unity-font-style: bold;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+.validation-message {
+    color: orange;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+/*=====================
+    Common Text
+======================*/
+
+.text-default {
+    color: #000000; /* デフォルトのテキストカラー */
+}
+
+.text-muted {
+    color: #6c757d; /* 少し薄いグレー */
+}
+
+.text-important {
+    color: #dc3545; /* 赤系の強調色 */
+    -unity-font-style: bold;
+}
+
+.text-link {
+    color: #007bff; /* 標準的なリンク色 */
+    cursor: link;
+    -unity-font-style: italic;
+}

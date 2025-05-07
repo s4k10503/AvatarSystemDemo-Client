@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- テンプレート -->
+    <Template src="project://database/Assets/Scripts/Presentation/View/Common/SlidePadComponent.uxml" name="SlidePad" />
+
+    <!-- スタイルシート -->
+    <!-- 注: RoomSystemPage.uss は提供されていません。スタイルが不完全な可能性があります -->
+    <Style src="RoomSystemPage.uss" />
+    <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
+
+    <!-- === ルームシステムページ ルート === -->
+    <VisualElement name="room-system-page-root" style="width: 100%; height: 100%;">
+
+        <!-- スライドパッドコンポーネント -->
+        <!-- 注: 以下のインラインスタイルは理想的には RoomSystemPage.uss に移動すべきです -->
+        <Instance template="SlidePad" name="slide-pad-instance" style="position: absolute; bottom: 50px; left: 50px; width: 150px; height: 150px;" />
+
+        <!-- === 他のルームシステムページのコンテンツ === -->
+        <!-- (ルームシステムの他のUI要素をここに追加します) -->
+
+    </VisualElement>
+</UXML>

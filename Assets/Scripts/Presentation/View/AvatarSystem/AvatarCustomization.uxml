@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- スタイルシート -->
+    <Style src="project://database/Assets/Scripts/Presentation/View/AvatarSystem/AvatarCustomization.uss" />
+    <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
+
+    <!-- テンプレート -->
+    <Template src="project://database/Assets/Scripts/Presentation/View/Common/SliderComponent.uxml" name="SliderComponent" />
+    <Template src="project://database/Assets/Scripts/Presentation/View/AvatarSystem/SkinColorSelector.uxml" name="SkinColorSelector" />
+    <Template src="project://database/Assets/Scripts/Presentation/View/AvatarSystem/HairColorSelector.uxml" name="HairColorSelector" />
+
+    <!-- === アクションボタン (ログアウト, リセット, 保存) === -->
+    <VisualElement name="reset-button-container" class="reset-button-container">
+        <Button text="ログアウト" name="logout-button" class="reset-button" />
+        <Button text="リセット" name="reset-button" class="reset-button" />
+        <Button text="保存" name="save-button" class="reset-button" />
+    </VisualElement>
+
+    <!-- === メインカスタマイズコンテナ === -->
+    <VisualElement name="avatar-customization-container" class="avatar-customization-container">
+
+        <!-- タブバー -->
+        <VisualElement name="tab-bar-container" class="tab-bar-container">
+            <VisualElement name="tab-bar-scroll-content" class="tab-bar-scroll-content">
+                <!-- ボディタブ -->
+                <Button name="body-tab" class="tab-button selected">
+                    <VisualElement name="body-icon" class="tab-icon" />
+                </Button>
+                <!-- 顔タブ -->
+                <Button name="face-tab" class="tab-button">
+                    <VisualElement name="face-icon" class="tab-icon" />
+                </Button>
+            </VisualElement>
+        </VisualElement>
+
+        <!-- タブコンテンツエリア -->
+        <VisualElement name="content-container" class="content-container">
+
+            <!-- ボディコンテンツ -->
+            <VisualElement name="body-content" class="body-content">
+                <VisualElement class="sliders-container">
+                    <Instance template="SliderComponent" name="height-slider-container">
+                        <AttributeOverrides element-name="slider-label" text="身長" />
+                        <AttributeOverrides element-name="slider-control" low-value="0.8" high-value="1.2" value="1.0" />
+                    </Instance>
+                    <Instance template="SliderComponent" name="shoulder-width-slider-container">
+                        <AttributeOverrides element-name="slider-label" text="肩幅" />
+                        <AttributeOverrides element-name="slider-control" low-value="0.8" high-value="1.2" value="1.0" />
+                    </Instance>
+                    <Instance template="SliderComponent" name="body-width-slider-container">
+                        <AttributeOverrides element-name="slider-label" text="体の横幅" />
+                        <AttributeOverrides element-name="slider-control" low-value="0.8" high-value="1.2" value="1.0" />
+                    </Instance>
+                    <!-- 肌色セレクター -->
+                    <Instance template="SkinColorSelector" name="skin-color-selector" />
+                </VisualElement>
+            </VisualElement>
+
+            <!-- 顔と髪コンテンツ -->
+            <VisualElement name="face-content" class="face-content">
+                <VisualElement class="sliders-container">
+                    <Instance template="SliderComponent" name="head-size-slider-container">
+                        <AttributeOverrides element-name="slider-label" text="頭の大きさ" />
+                        <AttributeOverrides element-name="slider-control" low-value="0.9" high-value="1.1" value="1.0" />
+                    </Instance>
+                    <!-- 髪色セレクター -->
+                    <Instance template="HairColorSelector" name="hair-color-selector" />
+                </VisualElement>
+            </VisualElement>
+
+        </VisualElement>
+    </VisualElement>
+</UXML>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- スタイルシート -->
+    <!-- .slider-container, .slider-label のようなスタイルはここで定義されるか、継承されます -->
+    <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
+    <!-- これをインスタンス化するUXMLで追加の特定スタイルが必要になる場合があります -->
+
+    <!-- === スライダーコンポーネント ルート === -->
+    <VisualElement name="slider-component" class="slider-container">
+        <!-- スライダーのラベル -->
+        <Label name="slider-label" text="デフォルトのスライダーラベル" class="slider-label" />
+        <!-- 実際のスライダーコントロール -->
+        <!-- 注: '.unity-slider', '.unity-base-slider__tracker' などの特定スタイルは -->
+        <!-- このコンポーネントが使用されるコンテキスト (例: AvatarCustomization.uss) で適用されることが多い -->
+        <Slider name="slider-control" low-value="0" high-value="1" value="0.5" />
+    </VisualElement>
+</UXML>

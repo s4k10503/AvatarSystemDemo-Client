@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- ここに直接のスタイルシートリンクはありません。スタイル (.slide-pad__background, .slide-pad__handle) は -->
+    <!-- CommonStyles.uss またはこのコンポーネントをインスタンス化するUXMLのUSSで定義されていると仮定します。 -->
+
+    <!-- === スライドパッドコンポーネント ルート === -->
+    <!-- 背景要素 -->
+    <VisualElement name="slide-pad-background" class="slide-pad__background">
+        <!-- ドラッグ可能なハンドル要素 -->
+        <VisualElement name="slide-pad-handle" class="slide-pad__handle" />
+    </VisualElement>
+</UXML>

@@ -1,0 +1,174 @@
+/* ===================== */
+/* === ページ基本スタイル === */
+/* ===================== */
+.login-page {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(240, 242, 245); /* 明るい背景 */
+    align-items: center;
+    justify-content: center;
+    padding: 20px; /* パディング追加 */
+    box-sizing: border-box;
+}
+
+/* ========================= */
+/* === メインコンテンツコンテナ === */
+/* ========================= */
+.login-container {
+    width: 90%;
+    max-width: 800px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 30px;
+    padding: 50px 60px; /* パディング調整 */
+    align-items: center;
+    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.1); /* わずかな影 */
+}
+
+/* ===================== */
+/* === ロゴエリア === */
+/* ===================== */
+.logo-container {
+    width: 100%;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.logo {
+    /* スタイル例 - 実際の画像やスタイルに置き換えてください */
+    width: 120px;
+    height: 120px;
+    background-color: rgb(59, 130, 246); /* 青のプレースホルダー */
+    border-radius: 50%; /* 円形にする */
+    margin-bottom: 25px;
+    /* background-image の使用を検討 */
+}
+
+.app-title {
+    font-size: 36px;
+    -unity-font-style: bold;
+    color: rgb(33, 33, 33);
+}
+
+/* ========================= */
+/* === ウェルカムメッセージエリア === */
+/* ========================= */
+.welcome-container {
+    width: 100%;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.welcome-title {
+    font-size: 42px;
+    -unity-font-style: bold;
+    color: rgb(33, 33, 33);
+    margin-bottom: 20px;
+    -unity-text-align: middle-center;
+}
+
+.welcome-message {
+    font-size: 24px;
+    color: rgb(100, 100, 100);
+    -unity-text-align: middle-center;
+    max-width: 80%; /* メッセージが広くなりすぎないように制限 */
+    line-height: 1.5; /* 可読性向上 */
+}
+
+/* ===================== */
+/* === ボタンコンテナ === */
+/* ===================== */
+.button-container {
+    display: flex; /* flexプロパティの適用を保証 */
+    width: 100%;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: nowrap; /* ボタンを1行に保つ */
+    gap: 30px; /* ギャップ増加 */
+    max-width: 700px; /* 最大幅制限 */
+    margin-top: 20px; /* マージン追加 */
+}
+
+/* ==================================== */
+/* === ボタン スタイル (プライマリ & セカンダリ) === */
+/* ==================================== */
+.primary-button {
+    flex-grow: 1; /* ボタンの拡大を許可 */
+    flex-basis: 0; /* スペース分配 */
+    height: 100px;
+    background-color: rgb(59, 130, 246);
+    border-radius: 50px;
+    border-width: 0;
+    color: rgb(255, 255, 255);
+    font-size: 30px; /* やや小さいフォント */
+    -unity-font-style: bold;
+    transition-property: background-color, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+    /* 'scale' が機能する場合、冗長なUnity固有のトランジションは削除 */
+    text-align: center; /* テキスト中央揃えを保証 */
+    white-space: normal; /* テキストの折り返しを許可 */
+    padding: 0 20px; /* パディング調整 */
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    background-color: rgb(37, 99, 235);
+}
+
+.primary-button:active {
+    /* transform: scale(0.95); */ /* scale プロパティを直接使用 */
+    scale: 0.95;
+    background-color: rgb(30, 80, 200);
+}
+
+.secondary-button {
+    flex-grow: 1;
+    flex-basis: 0;
+    height: 100px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 50px;
+    border-width: 2px;
+    border-color: rgb(59, 130, 246);
+    color: rgb(59, 130, 246);
+    font-size: 30px; /* やや小さいフォント */
+    transition-property: background-color, border-color, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+    /* 'scale' が機能する場合、冗長なUnity固有のトランジションは削除 */
+    box-sizing: border-box;
+    padding: 0 20px; /* パディング調整 */
+    white-space: normal; /* テキストの折り返しを許可 */
+    text-align: center; /* テキスト中央揃えを保証 */
+    cursor: pointer;
+}
+
+.secondary-button:hover {
+    background-color: rgb(240, 247, 255); /* 明るい青の背景 */
+    border-color: rgb(37, 99, 235); /* より濃い境界線 */
+}
+
+.secondary-button:active {
+    /* transform: scale(0.95); */ /* scale プロパティを直接使用 */
+    scale: 0.95;
+    background-color: rgb(230, 242, 250); /* やや濃い青の背景 */
+    border-color: rgb(30, 80, 200); /* 最も濃い境界線 */
+}
+
+/* ===================== */
+/* === バージョン情報 === */
+/* ===================== */
+.version-container {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    flex-direction: column; /* デフォルト方向 */
+    align-items: flex-start;
+}
+
+.version-label {
+    color: rgb(120, 120, 120);
+    font-size: 18px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+}

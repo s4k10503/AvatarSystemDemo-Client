@@ -1,0 +1,67 @@
+/* ========================= */
+/* === スライダースタイル === */
+/* ========================= */
+
+/* スライダーコンポーネントの汎用コンテナ (例: AvatarCustomization) */
+.slider-container {
+    margin: 0;
+    position: relative;
+    min-height: 120px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: hidden;
+    padding: 10px; /* パディング追加 */
+    margin-bottom: 5px; /* マージン追加 */
+}
+
+/* スライダーのラベル */
+.slider-label {
+    color: rgb(51, 51, 51);
+    font-size: 24px; /* サイズ調整 */
+    margin-bottom: 10px; /* マージン調整 */
+    -unity-font-style: bold;
+    /* position: absolute; */ /* flexで使用する場合は絶対位置指定を削除 */
+    /* top: 0; */
+    /* left: 50%; */
+    /* translate: -50% 0; */
+    align-self: center; /* flexカラム内でラベルを中央揃え */
+    white-space: nowrap;
+}
+
+
+/* ========================= */
+/* === スライドパッドスタイル === */
+/* ========================= */
+
+/* スライドパッドの背景円 */
+.slide-pad__background {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%; /* 完全な円にするためにパーセンテージを使用 */
+    background-color: rgba(255, 255, 255, 0.3);
+    border-width: 4px;
+    border-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* ハンドルを絶対位置指定する場合に必要 */
+}
+
+/* スライドパッドのドラッグ可能なハンドル */
+.slide-pad__handle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-width: 3px; /* やや細い境界線 */
+    border-color: rgba(0, 0, 0, 0.4);
+    position: absolute; /* ハンドルを背景内に配置 */
+    /* 中央揃えにはスクリプト調整が必要、通常 left/top が設定される */
+}
+
+.slide-pad__handle:active {
+    background-color: rgba(255, 255, 255, 1.0); /*掴んだときに完全に不透明にする */
+    border-color: rgba(0, 0, 0, 0.6);
+}

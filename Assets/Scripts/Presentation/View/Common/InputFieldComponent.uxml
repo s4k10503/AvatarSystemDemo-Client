@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- スタイルシート -->
+    <!-- .input-container とその中の Label および TextField のスタイルを定義します -->
+    <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
+
+    <!-- === 入力フィールドコンポーネント ルート === -->
+    <VisualElement name="input-field-container" class="input-container">
+        <!-- 入力フィールドのラベル -->
+        <!-- テキストはインスタンス化時に AttributeOverrides で設定する必要があります -->
+        <Label name="input-label" text="デフォルトラベル" />
+        <!-- テキストフィールド入力 -->
+        <!-- 'password' のような属性は AttributeOverrides で設定できます -->
+        <TextField name="input-field" />
+    </VisualElement>
+</UXML>

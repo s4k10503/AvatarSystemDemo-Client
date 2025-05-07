@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- スタイルシート -->
+    <Style src="project://database/Assets/Scripts/Presentation/View/Login/LoginModal.uss" />
+    <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
+
+    <!-- テンプレート -->
+    <Template src="project://database/Assets/Scripts/Presentation/View/Common/TabComponent.uxml" name="TabComponent" />
+    <Template src="project://database/Assets/Scripts/Presentation/View/Common/InputFieldComponent.uxml" name="InputFieldComponent" />
+    <Template src="project://database/Assets/Scripts/Presentation/View/Common/ButtonComponent.uxml" name="ButtonComponent" />
+
+    <!-- === ログインモーダル ルート === -->
+    <VisualElement name="login-modal" class="modal-base login-modal">
+        <VisualElement name="modal-content" class="modal-content-base modal-content">
+            <Label text="アカウント" class="title-base modal-title" />
+
+            <!-- === タブ (ログイン/登録) === -->
+            <Instance template="TabComponent" name="login-tab-container">
+                <VisualElement name="tab-container" class="tab-container">
+                    <Button text="ログイン" name="login-tab" class="tab-button tab-active" />
+                    <Button text="新規登録" name="register-tab" class="tab-button" />
+                </VisualElement>
+            </Instance>
+
+            <!-- === ログインフォーム === -->
+            <VisualElement name="login-form" class="form-container">
+                <!-- メールアドレス入力 -->
+                <Instance template="InputFieldComponent" name="email-field-container">
+                    <AttributeOverrides element-name="input-label" text="メールアドレス" />
+                    <!-- 入力フィールドはテンプレート内で設定 -->
+                </Instance>
+
+                <!-- パスワード入力 -->
+                <Instance template="InputFieldComponent" name="password-field-container">
+                    <AttributeOverrides element-name="input-label" text="パスワード" />
+                    <AttributeOverrides element-name="input-field" password="true" />
+                </Instance>
+
+                <!-- ログインエラーメッセージエリア -->
+                <Label name="login-error-label" class="error-label" />
+
+                <!-- ログインボタン -->
+                <VisualElement name="login-button-container" class="button-container">
+                    <Button text="キャンセル" name="login-cancel-button" class="cancel-button" />
+                    <Button text="ログイン" name="login-button" class="primary-button" />
+                </VisualElement>
+            </VisualElement>
+
+            <!-- === 登録フォーム (初期状態では非表示) === -->
+            <VisualElement name="register-form" class="form-container">
+                <!-- メールアドレス入力 -->
+                <Instance template="InputFieldComponent" name="register-email-field-container">
+                    <AttributeOverrides element-name="input-label" text="メールアドレス" />
+                </Instance>
+
+                <!-- パスワード入力 -->
+                <Instance template="InputFieldComponent" name="register-password-field-container">
+                    <AttributeOverrides element-name="input-label" text="パスワード" />
+                    <AttributeOverrides element-name="input-field" password="true" />
+                </Instance>
+
+                <!-- パスワード確認入力 -->
+                <Instance template="InputFieldComponent" name="confirm-password-field-container">
+                    <AttributeOverrides element-name="input-label" text="パスワード確認" />
+                    <AttributeOverrides element-name="input-field" password="true" />
+                </Instance>
+
+                <!-- 登録エラーメッセージエリア -->
+                <Label name="register-error-label" class="error-label" />
+
+                <!-- 登録ボタン -->
+                <VisualElement name="register-button-container" class="button-container">
+                    <Button text="キャンセル" name="register-cancel-button" class="cancel-button" />
+                    <Button text="登録" name="register-button" class="primary-button" />
+                </VisualElement>
+            </VisualElement>
+
+        </VisualElement>
+    </VisualElement>
+</UXML>

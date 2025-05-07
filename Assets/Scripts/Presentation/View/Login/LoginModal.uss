@@ -1,0 +1,222 @@
+/* ===================== */
+/* === モーダル基本スタイル === */
+/* ===================== */
+.login-modal {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    /* .modal-base が基本スタイリングを提供すると仮定 */
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 700px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 30px;
+    padding: 50px;
+    /* .modal-content-base が基本スタイリングを提供すると仮定 */
+}
+
+.modal-title {
+    font-size: 36px;
+    margin-bottom: 40px;
+    -unity-text-align: middle-center;
+    color: rgb(33, 33, 33);
+    -unity-font-style: bold;
+    /* .title-base が基本スタイリングを提供すると仮定 */
+}
+
+/* ===================== */
+/* === 入力フィールド === */
+/* ===================== */
+.input-container {
+    margin-bottom: 35px;
+}
+
+.input-container Label {
+    display: flex; /* 必要に応じて配置にflexを使用 */
+    margin-bottom: 15px;
+    color: rgb(51, 51, 51);
+    font-size: 26px;
+}
+
+.input-container TextField {
+    height: 90px;
+    background-color: rgb(248, 249, 250);
+    border-width: 2px;
+    border-color: rgb(206, 212, 218);
+    border-radius: 45px;
+    color: rgb(33, 33, 33);
+    font-size: 30px;
+    padding: 0 30px; /* テキストを垂直中央揃えにするためにパディング調整 */
+    transition-property: border-color, background-color;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+    overflow: hidden; /* border-radius がコンテンツをクリップすることを保証 */
+    align-items: center; /* テキスト入力を垂直中央揃え */
+}
+
+.input-container TextField:focus {
+    border-color: rgb(59, 130, 246);
+    border-width: 3px;
+    background-color: rgb(255, 255, 255);
+}
+
+/* TextField 内の実際のテキスト入力要素のスタイル */
+.input-container TextField > TextInput {
+    background-color: transparent; /* 背景を継承 */
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1; /* TextField を埋めるように入力を許可 */
+    height: 100%; /* 完全な高さを取ることを保証 */
+    font-size: 30px; /* TextField のフォントサイズに合わせる */
+    color: #000000; /* テキスト色を黒に設定 */
+    /* TextField がフォーカススタイルを処理する場合、フォーカススタイルをリセット */
+}
+
+.input-container TextField > TextInput:focus {
+    background-color: transparent;
+    /* TextField がフォーカスを処理する場合、境界線や特定のフォーカススタイルは不要 */
+}
+
+/* ===================== */
+/* === ボタン === */
+/* ===================== */
+.button-container {
+    display: flex; /* flexプロパティの適用を保証 */
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 50px;
+    gap: 20px; /* ボタン間のギャップ追加 */
+}
+
+.primary-button {
+    flex-grow: 1; /* ボタンの拡大を許可 */
+    flex-basis: 0; /* スペースを均等に分配 */
+    /* width: 55%; */ /* flex-grow/basis で置き換え */
+    height: 100px;
+    background-color: rgb(59, 130, 246);
+    border-radius: 50px;
+    border-width: 0;
+    color: rgb(255, 255, 255);
+    font-size: 30px;
+    transition-property: background-color, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center; /* テキストが中央揃えされることを保証 */
+    cursor: pointer; /* ポインターカーソル追加 */
+}
+
+.primary-button:hover {
+    background-color: rgb(37, 99, 235);
+}
+
+.primary-button:active {
+    background-color: rgb(30, 80, 200);
+    scale: 0.97; /* やや控えめなスケール */
+}
+
+.cancel-button {
+    flex-grow: 1;
+    flex-basis: 0;
+    /* width: 40%; */ /* flex-grow/basis で置き換え */
+    height: 100px;
+    background-color: transparent;
+    border-radius: 50px;
+    border-width: 2px;
+    border-color: rgb(150, 150, 150); /* やや濃いグレー */
+    color: rgb(80, 80, 80);
+    font-size: 30px;
+    transition-property: background-color, border-color, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+    -unity-text-align: middle-center; /* テキストが中央揃えされることを保証 */
+    cursor: pointer; /* ポインターカーソル追加 */
+}
+
+.cancel-button:hover {
+    background-color: rgba(200, 200, 200, 0.2);
+    border-color: rgb(100, 100, 100); /* ホバー時に境界線を濃くする */
+}
+
+.cancel-button:active {
+    background-color: rgba(190, 190, 190, 0.3);
+    scale: 0.97;
+}
+
+/* ===================== */
+/* === エラーラベル === */
+/* ===================== */
+.error-label {
+    color: rgb(220, 53, 69); /* 標準的なエラーの赤 */
+    -unity-text-align: middle-center;
+    white-space: normal; /* テキストの折り返しを許可 */
+    padding: 15px 0; /* パディング調整 */
+    margin-top: 10px; /* 上マージン追加 */
+    min-height: 30px; /* 空の場合でもスペースを確保 */
+    display: none; /* デフォルトで非表示 */
+    font-size: 22px;
+}
+
+/* ===================== */
+/* === タブ === */
+/* ===================== */
+.tab-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 35px;
+    width: 100%;
+    gap: 15px; /* スペースにgapを使用 */
+}
+
+.tab-button {
+    flex-grow: 1; /* タブが利用可能なスペースを取るようにする */
+    /* width: 45%; */ /* 固定幅削除 */
+    height: 80px;
+    background-color: rgb(240, 240, 240);
+    border-radius: 40px;
+    border-width: 0;
+    color: rgb(80, 80, 80);
+    font-size: 26px;
+    /* margin: 0 15px; */ /* マージン削除、gapを使用 */
+    transition-property: background-color, color;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+    -unity-text-align: middle-center; /* テキストが中央揃えされることを保証 */
+    cursor: pointer; /* ポインターカーソル追加 */
+}
+
+.tab-button:hover {
+    background-color: rgb(230, 230, 230);
+}
+
+.tab-button:active {
+    background-color: rgb(220, 220, 220);
+}
+
+.tab-button.tab-active {
+    background-color: rgb(59, 130, 246);
+    color: rgb(255, 255, 255);
+}
+
+.tab-button.tab-active:hover {
+    background-color: rgb(37, 99, 235); /* アクティブなタブの一貫したホバー */
+}
+
+/* ===================== */
+/* === フォームコンテナ === */
+/* ===================== */
+.form-container {
+    width: 100%;
+}
+
+/* 登録フォームを初期状態で非表示にする */
+#register-form {
+    display: none;
+}

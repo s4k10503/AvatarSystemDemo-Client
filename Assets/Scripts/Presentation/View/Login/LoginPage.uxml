@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- スタイルシート -->
+    <Style src="project://database/Assets/Scripts/Presentation/View/Login/LoginPage.uss" />
+    <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
+
+    <!-- テンプレート -->
+    <Template src="project://database/Assets/Scripts/Presentation/View/Common/ButtonComponent.uxml" name="ButtonComponent" />
+
+    <!-- === ログインページルート === -->
+    <VisualElement name="login-page" class="login-page">
+        <!-- === メインログインコンテナ === -->
+        <VisualElement name="login-container" class="login-container">
+
+            <!-- ロゴとタイトル -->
+            <VisualElement name="logo-container" class="logo-container">
+                <VisualElement name="logo" class="logo" />
+                <Label text="アバターシステムサンプル" class="app-title" />
+            </VisualElement>
+
+            <!-- ウェルカムメッセージ -->
+            <VisualElement name="welcome-container" class="welcome-container">
+                <Label text="ようこそ" class="welcome-title" />
+                <Label text="ログインが必要です" class="welcome-message" />
+            </VisualElement>
+
+            <!-- アクションボタン -->
+            <VisualElement name="button-container" class="button-container">
+                <Button text="ログイン" name="open-login-button" class="primary-button" />
+                <Button text="ゲストとして続ける" name="continue-as-guest-button" class="secondary-button" />
+            </VisualElement>
+        </VisualElement>
+
+        <!-- バージョン情報 (左下) -->
+        <VisualElement name="version-container" class="version-container">
+            <Label text="" name="version-label" class="version-label" />
+            <Label text="" name="app-id-label" class="version-label" />
+        </VisualElement>
+    </VisualElement>
+</UXML>

@@ -1,0 +1,86 @@
+/* ========================= */
+/* === フォーム入力スタイル === */
+/* ========================= */
+
+/* ラベルと入力フィールドのコンテナ */
+.input-container {
+    margin-bottom: 35px;
+    width: 100%; /* コンテナが全幅を取るようにする */
+}
+
+.input-container Label {
+    display: flex;
+    margin-bottom: 15px;
+    color: rgb(51, 51, 51);
+    font-size: 26px;
+}
+
+/* TextFieldコンテナ */
+.input-container TextField {
+    height: 90px;
+    width: 100%; /* TextFieldが全幅を取るようにする */
+    background-color: rgb(248, 249, 250);
+    border-width: 2px;
+    border-color: rgb(206, 212, 218);
+    border-radius: 45px;
+    color: rgb(33, 33, 33);
+    font-size: 30px;
+    padding: 0 30px;
+    transition-property: border-color, background-color;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+    overflow: hidden;
+    display: flex; /* テキスト入力を中央揃えにするためにflexを使用 */
+    align-items: center;
+}
+
+.input-container TextField:focus {
+    border-color: rgb(59, 130, 246);
+    border-width: 3px;
+    background-color: rgb(255, 255, 255);
+}
+
+/* TextField内の実際のTextInput要素 */
+.input-container TextField > TextInput {
+    background-color: transparent;
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+    font-size: 30px;
+    /* border-radius: 45px; */ /* 親要素でクリップされるため不要 */
+    color: #000000;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.input-container TextField > TextInput:focus {
+    background-color: transparent;
+    /* TextFieldがフォーカスを処理する場合、特別なフォーカスは不要 */
+}
+
+/*=====================
+  Form Elements (General)
+======================*/
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.label {
+    font-size: 16px;
+    color: #000000;
+    margin-bottom: 5px;
+    -unity-font-style: bold;
+}
+
+.text-field {
+    font-size: 16px;
+    padding: 8px;
+    border-width: 1px;
+    border-color: #ced4da;
+    border-radius: 4px;
+}
+
+.text-field:focus {
+    border-color: #80bdff;
+}

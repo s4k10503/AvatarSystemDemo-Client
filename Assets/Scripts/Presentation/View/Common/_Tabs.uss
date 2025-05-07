@@ -1,0 +1,45 @@
+/* ======================= */
+/* === タブスタイル === */
+/* ======================= */
+
+/* タブボタンのコンテナ */
+.tab-container {
+    display: flex; /* flexレイアウトを保証 */
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 35px;
+    width: 100%;
+}
+
+/* 個々のタブボタン */
+.tab-button {
+    /* button-baseから継承 */
+    height: 80px;
+    background-color: rgb(240, 240, 240);
+    border-radius: 40px;
+    border-width: 0;
+    color: rgb(80, 80, 80);
+    font-size: 26px;
+    /* margin: 0 15px; */ /* コンテナのgapで置き換え */
+    flex-grow: 1; /* タブがスペースを埋めるようにする */
+    flex-basis: 0;
+}
+
+.tab-button:hover {
+    background-color: rgb(230, 230, 230);
+}
+
+.tab-button:active {
+    background-color: rgb(220, 220, 220);
+    scale: 0.98;
+}
+
+/* アクティブなタブボタンのスタイル */
+.tab-button.tab-active {
+    background-color: rgb(59, 130, 246);
+    color: rgb(255, 255, 255);
+}
+
+.tab-button.tab-active:hover {
+    background-color: rgb(37, 99, 235);
+}

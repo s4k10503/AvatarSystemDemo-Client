@@ -1,0 +1,48 @@
+/*=====================
+    Utility Classes
+======================*/
+
+.margin-top-10 {
+    margin-top: 10px;
+}
+
+.margin-bottom-20 {
+    margin-bottom: 20px;
+}
+
+.padding-15 {
+    padding: 15px;
+}
+
+.text-center {
+    -unity-text-align: middle-center;
+}
+
+.hidden {
+    display: none;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.centered-container {
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.scroll-view-content {
+    flex-grow: 1;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+/* ボタンの共通コンテナ (フォーム/モーダルの下部でよく使用される) */
+.button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 40px; /* マージン調整 */
+    width: 100%;
+}

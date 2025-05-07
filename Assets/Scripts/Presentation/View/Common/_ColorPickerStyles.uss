@@ -1,0 +1,107 @@
+/* =============================================== */
+/* カラーピッカースタイル
+/* =============================================== */
+
+/* カラーセレクターコンポーネント全体のコンテナ */
+.color-selector-container {
+    /* 必要に応じて追加の共通スタイルをここに記述 */
+}
+
+/* ラベル専用のコンテナ */
+.color-selector-label-container {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* ラベルテキスト自体 */
+.color-selector-label {
+    -unity-font-style: bold;
+    color: rgb(51, 51, 51);
+    font-size: 24px;
+    margin-bottom: 0;
+    align-self: auto;
+    white-space: nowrap;
+}
+
+/* プリセットカラーボタンを保持するコンテナ */
+.color-preset-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 35px;
+    border-width: 2px;
+    border-color:rgb(200, 200, 200);
+    padding: 10px 6px;
+    margin-top: 5px;
+    height: 70px;
+}
+
+/* 個々のプリセットボタン */
+.color-preset-button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    margin: 5px; /* 子要素間のスペース */
+    border-radius: 50%; /* 円形ボタン */
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0.1);
+    padding: 0;
+    background-color: grey; /* デフォルト/プレースホルダー */
+    transition-property: border-color;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+}
+
+/* 選択されているプリセットボタンのスタイル */
+.color-preset-button--selected {
+    border-color: #007bff;
+    border-width: 3px;
+}
+
+/* === スキンカラー プリセットカラー定義 === */
+#skin-color-preset-0 {
+    background-color: rgb(244, 204, 176); /* 標準的な肌色 */
+}
+
+#skin-color-preset-1 {
+    background-color: rgb(255, 222, 186); /* 明るい肌色 */
+}
+
+#skin-color-preset-2 {
+    background-color: rgb(224, 171, 153); /* 中間の肌色 */
+}
+
+#skin-color-preset-3 {
+    background-color: rgb(140, 94, 61);   /* 濃い肌色 */
+}
+
+#skin-color-preset-4 {
+    background-color: rgb(102, 64, 38);   /* 非常に濃い肌色 */
+}
+
+/* === 髪色 プリセットカラー定義 === */
+#hair-color-preset-0 {
+    background-color: rgb(26, 26, 26); /* 黒 */
+}
+
+#hair-color-preset-1 {
+    background-color: rgb(64, 38, 13); /* ダークブラウン */
+}
+
+#hair-color-preset-2 {
+    background-color: rgb(102, 51, 20); /* ブラウン */
+}
+
+#hair-color-preset-3 {
+    background-color: rgb(218, 165, 32); /* ブロンド */
+}
+
+#hair-color-preset-4 {
+    background-color: rgb(165, 42, 42); /* 赤/赤褐色 */
+}

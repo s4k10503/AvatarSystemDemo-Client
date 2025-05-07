@@ -1,0 +1,23 @@
+{
+    "name": "Infrastructure",
+    "rootNamespace": "",
+    "references": [
+        "Domain",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Firebase.Auth.dll",
+        "Firebase.App.dll",
+        "Firebase.Platform.dll",
+        "System.ComponentModel.Annotations.dll",
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

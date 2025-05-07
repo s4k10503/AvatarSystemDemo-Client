@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xmlns:app="Unity.UI.Builder"
+    xsi:noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="UnityEngine.UIElements ../../../../UIElementsSchema/UnityEngine.UIElements.xsd
+                        UnityEditor.UIElements ../../../../UIElementsSchema/UnityEditor.UIElements.xsd">
+
+    <!-- スタイルシート -->
+    <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
+
+    <!-- === 髪色セレクター === -->
+    <VisualElement name="hair-color-container" class="color-selector-container">
+        <!-- ラベル -->
+        <VisualElement class="color-selector-label-container">
+            <Label text="髪の色" class="color-selector-label" />
+        </VisualElement>
+
+        <!-- カラープリセットボタン -->
+        <VisualElement name="hair-color-preset-container" class="color-preset-container">
+            <!-- プリセットボタンはコードで動的に生成されます -->
+            <!-- 構造例 (実際のボタンはC#で追加): -->
+            <!--
+            <Button name="hair-color-preset-0" class="hair-color-preset-button" />
+            <Button name="hair-color-preset-1" class="hair-color-preset-button" />
+            <Button name="hair-color-preset-2" class="hair-color-preset-button" />
+            <Button name="hair-color-preset-3" class="hair-color-preset-button" />
+            <Button name="hair-color-preset-4" class="hair-color-preset-button" />
+            -->
+        </VisualElement>
+    </VisualElement>
+</UXML>

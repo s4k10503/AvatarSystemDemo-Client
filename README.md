@@ -8,7 +8,7 @@ Unityでアバターシステムを実装するデモ
 - Firebaseによるバックエンド連携
 - ビルドターゲットはAndroidを想定
 
-https://github.com/user-attachments/assets/3098394c-4a4c-4f3a-89c3-af8c72af6c18
+https://github.com/user-attachments/assets/4cba010a-ec97-4509-bb4f-affaa771bf88
 
 ## 機能
 

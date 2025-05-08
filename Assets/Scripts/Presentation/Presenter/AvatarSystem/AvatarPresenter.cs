@@ -542,9 +542,25 @@ namespace Presentation.Presenter
                     .Subscribe(tabIndex => HandleTabChanged(tabIndex))
                     .AddTo(_disposables);
 
-                // Added: Subscribe to camera rotation requests from the page
+                // カメラ回転イベントの購読
                 _avatarSystemPage.OnCameraRotateRequested
-                    .Subscribe(delta => _cameraView?.UpdateRotationByDelta(delta))
+                    .Subscribe(delta => { if (_cameraView != null) _cameraView.UpdateRotationByDelta(delta); })
+                    .AddTo(_disposables);
+
+                // カメラズームイベントの購読
+                _avatarSystemPage.OnCameraZoomRequested
+                    .Subscribe(pinchDelta =>
+                    {
+                        if (_cameraView != null) _cameraView.AdjustZoom(pinchDelta);
+                    })
+                    .AddTo(_disposables);
+
+                // カメラ高さ調整イベントの購読
+                _avatarSystemPage.OnCameraHeightRequested
+                    .Subscribe(deltaY =>
+                    {
+                        if (_cameraView != null) _cameraView.AdjustHeight(deltaY);
+                    })
                     .AddTo(_disposables);
             }
         }

@@ -74,6 +74,8 @@ namespace Presentation.View
         private Subject<bool> _uiVisibilityChangedSubject;
         private Subject<int> _tabChangedSubject;
         private Subject<Vector2> _cameraRotationDeltaSubject;
+        private Subject<float> _cameraZoomRequestedSubject;
+        private Subject<float> _cameraHeightDeltaSubject;
 
         // 肌色プリセット
         private SkinColor[] _skinColorPresets;
@@ -110,6 +112,10 @@ namespace Presentation.View
             => _tabChangedSubject ??= new Subject<int>();
         public Observable<Vector2> OnCameraRotateRequested
             => _cameraRotationDeltaSubject ??= new Subject<Vector2>();
+        public Observable<float> OnCameraZoomRequested
+            => _cameraZoomRequestedSubject ??= new Subject<float>();
+        public Observable<float> OnCameraHeightRequested
+            => _cameraHeightDeltaSubject ??= new Subject<float>();
 
         private CompositeDisposable _disposables;
 
@@ -122,6 +128,26 @@ namespace Presentation.View
         /// </summary>
         private void OnEnable()
         {
+            Initialize();
+        }
+
+        /// <summary>
+        /// 初期化処理を行います。
+        /// </summary>
+        private void Initialize()
+        {
+            InitializeFields();
+            InitializeUIElements();
+            SetupListeners();
+            InitializeDisposables();
+            SubscribeToInputHandlerEvents();
+        }
+
+        /// <summary>
+        /// フィールドを初期化します。
+        /// </summary>
+        private void InitializeFields()
+        {
             // 肌色プリセットを初期化
             _skinColorPresets = Domain.ValueObjects.SkinColor.GetPresets();
             // 髪色プリセットを初期化
@@ -129,6 +155,25 @@ namespace Presentation.View
 
             _contentHandler.Reset();
             _tabHandler.Reset();
+
+            // ReactivePropertyを初期化
+            _heightProperty = new ReactiveProperty<float>();
+            _shoulderWidthProperty = new ReactiveProperty<float>();
+            _bodyWidthProperty = new ReactiveProperty<float>();
+            _headSizeProperty = new ReactiveProperty<float>();
+            _skinColorProperty = new ReactiveProperty<SkinColor>(Domain.ValueObjects.SkinColor.Default);
+            _hairColorProperty = new ReactiveProperty<HairColor>(Domain.ValueObjects.HairColor.Default);
+
+            // Subjectを初期化
+            _resetRequestedSubject = new Subject<Unit>();
+            _saveRequestedSubject = new Subject<Unit>();
+            _logoutRequestedSubject = new Subject<Unit>();
+            _nonUIPointerUpSubject = new Subject<Vector2>();
+            _uiVisibilityChangedSubject = new Subject<bool>();
+            _tabChangedSubject = new Subject<int>();
+            _cameraRotationDeltaSubject = new Subject<Vector2>();
+            _cameraZoomRequestedSubject = new Subject<float>();
+            _cameraHeightDeltaSubject = new Subject<float>();
 
             // UIDocumentが必要なため、ここでInputHandlerインスタンスを作成
             if (TryGetDocument())
@@ -144,16 +189,12 @@ namespace Presentation.View
                 return; // InputHandlerが作成できない場合は初期化を中断
             }
 
-            InitializeUIElements();
-            SetupListeners();
-
             // UIの表示状態を初期化（常に表示状態で開始）
             _isUIVisible = true;
             _lastUIToggleTime = Time.time;
-            UpdateUIVisibility();
-
-            // InputHandlerイベントの購読 (カメラ制御など)
-            SubscribeToInputHandlerEvents();
+            _isSwitchingTabs = false;
+            _currentPageIndex = 0;
+            _initialized = false;
         }
 
         /// <summary>
@@ -404,29 +445,11 @@ namespace Presentation.View
         {
             if (!_initialized)
             {
-                // 初期化前に呼ばれた場合のエラーログを追加
                 Debug.LogError("[AvatarSystemPage] InitializeUIElementsが完了する前にSetupListenersが呼び出されました。");
-                return; // ここでリターンしないと、nullチェックを通過しない要素でエラーが発生する可能性
+                return;
             }
 
             _disposables = new CompositeDisposable();
-
-            // ReactivePropertyを初期化 (null合体演算子 ??= を使用しているので再初期化はされない)
-            _heightProperty ??= new ReactiveProperty<float>();
-            _shoulderWidthProperty ??= new ReactiveProperty<float>();
-            _bodyWidthProperty ??= new ReactiveProperty<float>();
-            _headSizeProperty ??= new ReactiveProperty<float>();
-            _skinColorProperty ??= new ReactiveProperty<SkinColor>(Domain.ValueObjects.SkinColor.Default);
-            _hairColorProperty ??= new ReactiveProperty<HairColor>(Domain.ValueObjects.HairColor.Default);
-
-            // Subjectを初期化 (null合体演算子 ??= を使用)
-            _resetRequestedSubject ??= new Subject<Unit>();
-            _saveRequestedSubject ??= new Subject<Unit>();
-            _logoutRequestedSubject ??= new Subject<Unit>();
-            _nonUIPointerUpSubject ??= new Subject<Vector2>();
-            _uiVisibilityChangedSubject ??= new Subject<bool>();
-            _tabChangedSubject ??= new Subject<int>();
-            _cameraRotationDeltaSubject ??= new Subject<Vector2>();
 
             // 各Setupメソッドは内部でnullチェックを行うべき
             SetupSliderListeners();
@@ -933,21 +956,6 @@ namespace Presentation.View
             // ハンドラーもDispose
             _tabHandler?.Dispose();
             _contentHandler?.Dispose();
-
-            // このクラスが直接管理するSubjectもDispose
-            // 配列にまとめてNull検査を効率化
-            var disposables = new IDisposable[] {
-                _resetRequestedSubject, _saveRequestedSubject, _logoutRequestedSubject,
-                _nonUIPointerUpSubject, _uiVisibilityChangedSubject, _tabChangedSubject,
-                _heightProperty, _shoulderWidthProperty, _bodyWidthProperty, _headSizeProperty,
-                _skinColorProperty, _hairColorProperty,
-                _cameraRotationDeltaSubject
-            };
-
-            foreach (var disposable in disposables)
-            {
-                disposable?.Dispose();
-            }
         }
 
         /// <summary>
@@ -997,6 +1005,8 @@ namespace Presentation.View
             _inputHandler.PointerMove
                 // ドラッグ中(RPから取得)の場合のみ反応
                 .Where(_ => _inputHandler.IsDragging.CurrentValue)
+                // マルチタップ中は回転しないように、タッチ数が1以下の場合のみ回転を許可
+                .Where(_ => _inputHandler.GetTouchCount() <= 1)
                 // UI操作を除外
                 .Where(pos => !_inputHandler.IsPointerOverUI(pos))
                 .Subscribe(currentPos =>
@@ -1005,8 +1015,17 @@ namespace Presentation.View
                     Vector2 previousPos = _inputHandler.PreviousPointerPosition.CurrentValue;
                     Vector2 delta = currentPos - previousPos;
 
-                    // イベントを発行
-                    _cameraRotationDeltaSubject?.OnNext(delta);
+                    // 水平方向と垂直方向の移動量を分離
+                    if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+                    {
+                        // 主に水平方向の移動の場合、カメラ回転イベントを発行
+                        _cameraRotationDeltaSubject?.OnNext(new Vector2(delta.x, 0));
+                    }
+                    else
+                    {
+                        // 主に垂直方向の移動の場合、カメラ高さ変更イベントを発行
+                        _cameraHeightDeltaSubject?.OnNext(delta.y);
+                    }
                 })
                 .AddTo(_disposables);
 
@@ -1015,22 +1034,54 @@ namespace Presentation.View
                 .Where(pos => !_inputHandler.IsPointerOverUI(pos))
                 .Subscribe(pos =>
                 {
-                    // RPを使用して短いドラッグ(タップ)だったか判断
-                    bool wasDragging = _inputHandler.IsDragging.CurrentValue;
-                    float dragDistance = _inputHandler.DragDistance.CurrentValue;
-                    // TODO: publicにした定数を参照する
-                    bool isShortDrag = wasDragging && dragDistance < UnityInputHandler.SHORT_DRAG_THRESHOLD;
-
-                    // ドラッグ状態はPointerUp時にInputHandler内部でリセットされる
-
-                    // ドラッグでなかった場合 (または非常に短いドラッグ、つまりタップ)
-                    if (!wasDragging || isShortDrag)
+                    // 短いドラッグ（タップ）かどうかを判定
+                    if (_inputHandler.IsShortDrag)
                     {
                         // 非UI領域でのポインターアップを通知 (UIトグルなど)
                         HandleNonUIPointerUp(pos);
                     }
                 })
                 .AddTo(_disposables);
+
+            // ズームイベントの購読
+            _inputHandler.OnPinch
+                .Subscribe(pinchDelta =>
+                {
+                    _cameraZoomRequestedSubject?.OnNext(pinchDelta);
+                })
+                .AddTo(_disposables);
+        }
+
+        /// <summary>
+        /// 破棄可能オブジェクトを初期化します。
+        /// </summary>
+        private void InitializeDisposables()
+        {
+            var disposables = new IDisposable[] {
+                // Subjects
+                _resetRequestedSubject,
+                _saveRequestedSubject,
+                _logoutRequestedSubject,
+                _nonUIPointerUpSubject,
+                _uiVisibilityChangedSubject,
+                _tabChangedSubject,
+                _cameraRotationDeltaSubject,
+                _cameraZoomRequestedSubject,
+                _cameraHeightDeltaSubject,
+
+                // Reactive Properties
+                _heightProperty,
+                _shoulderWidthProperty,
+                _bodyWidthProperty,
+                _headSizeProperty,
+                _skinColorProperty,
+                _hairColorProperty
+            };
+
+            foreach (var disposable in disposables)
+            {
+                _disposables.Add(disposable);
+            }
         }
     }
 }

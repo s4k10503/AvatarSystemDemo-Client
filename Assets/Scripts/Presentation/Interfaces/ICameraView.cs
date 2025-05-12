@@ -50,5 +50,11 @@ namespace Presentation.Interfaces
         /// <param name="headOffset">アバターのルートからの相対的な頭の位置</param>
         /// <param name="headPosition">頭の世界座標位置</param>
         void SetHeadPosition(Vector3 headOffset, Vector3 headPosition);
+
+        /// <summary>
+        /// ズームを調整する
+        /// </summary>
+        /// <param name="pinchDelta">ピンチの変化量</param>
+        void AdjustZoom(float pinchDelta);
     }
 }

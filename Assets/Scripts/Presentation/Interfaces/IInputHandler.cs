@@ -24,6 +24,12 @@ namespace Presentation.Interfaces
         Observable<VisualElement> ElementDragStarted { get; }
         Observable<VisualElement> ElementDragEnded { get; }
 
+        /// <summary>
+        /// ピンチジェスチャー中の2本の指の間の距離の変化を発行するObservable。
+        /// 通常、正の値は指が離れることを意味し、負の値は指が近づくことを意味します。
+        /// </summary>
+        Observable<float> OnPinch { get; }
+
         // --- State & Actions ---
 
         /// <summary>
@@ -49,6 +55,11 @@ namespace Presentation.Interfaces
         /// </summary>
         void StartGlobalDragging();
 
+        /// <summary>
+        /// 短いドラッグ（タップ）かどうかを確認します。
+        /// </summary>
+        bool IsShortDrag { get; }
+
         // --- Touch Utilities (Multi-touch support) ---
 
         /// <summary>
@@ -65,7 +76,7 @@ namespace Presentation.Interfaces
         Touch? GetTouch(int index);
 
         /// <summary>
-        /// 指定したフェーズに合致する *最初の* タッチを取得します。
+        /// 指定したフェーズに合致する最初のタッチを取得します。
         /// </summary>
         /// <param name="phase">検索するタッチフェーズ</param>
         /// <param name="touch">見つかったタッチ情報</param>
@@ -73,7 +84,7 @@ namespace Presentation.Interfaces
         bool TryGetTouchByPhase(TouchPhase phase, out Touch touch);
 
         /// <summary>
-        /// 指定したフェーズに合致する *すべての* タッチを取得します。
+        /// 指定したフェーズに合致するすべてのタッチを取得します。
         /// </summary>
         /// <param name="phase">検索するタッチフェーズ</param>
         /// <returns>合致するタッチ情報の列挙子</returns>

@@ -24,7 +24,6 @@ namespace DI
         // アバターカスタマイズ関連
         [SerializeField] private CameraView cameraView;
         [SerializeField] private AvatarSystemPage avatarSystemPage;
-        [SerializeField] private GameObject avatarRoot;
 
         // ログイン関連
         [SerializeField] private LoginPage loginPage;
@@ -65,9 +64,11 @@ namespace DI
             builder.Register<IVersionProviderService, VersionProviderService>(Lifetime.Singleton);
             builder.Register<IRequestSenderService, HttpApiClientService>(Lifetime.Singleton);
             builder.Register<IModelValidatorService, ModelValidatorService>(Lifetime.Singleton);
+            builder.Register<ILogService, UnityLogService>(Lifetime.Singleton);
+            builder.Register<IAvatarLoader, AddressableAvatarLoader>(Lifetime.Singleton);
+
             builder.Register<IAvatarCustomizationService, AvatarCustomizationService>(Lifetime.Singleton);
             builder.Register<IAvatarSkinColorService, AvatarSkinColorService>(Lifetime.Singleton);
-            builder.Register<ILogService, UnityLogService>(Lifetime.Singleton);
             builder.Register<IAvatarHairColorService, AvatarHairColorService>(Lifetime.Singleton);
 
             // ファイルベースのリポジトリ
@@ -83,6 +84,7 @@ namespace DI
             // UseCaseの登録
             builder.Register<LoginUseCase>(Lifetime.Singleton);
             builder.Register<AvatarCustomizationUseCase>(Lifetime.Singleton);
+            builder.Register<AvatarLifecycleUseCase>(Lifetime.Singleton).WithParameter<ILogService>(resolver => resolver.Resolve<ILogService>());
         }
 
         private void RegisterPresentation(IContainerBuilder builder)
@@ -118,15 +120,6 @@ namespace DI
 
                 if (cameraView != null)
                     builder.RegisterComponent(cameraView);
-
-                // アバター関連コンポーネントの登録
-                if (avatarRoot != null)
-                {
-                    // Animatorを取得して登録
-                    var animator = avatarRoot.GetComponent<Animator>();
-                    builder.RegisterInstance(animator);
-                    builder.RegisterInstance(avatarRoot);
-                }
 
                 // InputHandlerの登録
                 builder.Register<IInputHandler, UnityInputHandler>(Lifetime.Singleton);

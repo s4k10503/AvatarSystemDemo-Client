@@ -1,36 +1,65 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-
 using Domain.Interfaces;
 using Domain.ValueObjects;
 
 namespace Infrastructure.Services
 {
-    public sealed class AvatarCustomizationService : IAvatarCustomizationService
+    public sealed class AvatarCustomizationService : IAvatarCustomizationService, IAnimatorSettable, IDisposable
     {
-        private readonly Animator _animator;
+        private object _animator;
         private BodyScale _currentScale;
 
         // ボーンキャッシュ（すべてのHumanBodyBonesをまとめる）
         private readonly Dictionary<HumanBodyBones, Transform> _boneCache = new();
 
         // 各部位のボーン群
-        private readonly Transform[] _torsoBones;      // Hips, Spine, Chest, UpperChest
-        private readonly Transform[] _headBones;       // Head
-        private readonly Transform[] _shoulderBones;   // LeftShoulder, RightShoulder
-        private readonly Transform[] _armBones;        // LeftUpperArm, RightUpperArm, LeftLowerArm, RightLowerArm
-        private readonly Transform[] _upperLegBones;   // LeftUpperLeg, RightUpperLeg
-        private readonly Transform[] _lowerLegBones;   // LeftLowerLeg, RightLowerLeg
-        private readonly Transform[] _footBones;       // LeftFoot, RightFoot
+        private Transform[] _torsoBones;      // Hips, Spine, Chest, UpperChest
+        private Transform[] _headBones;       // Head
+        private Transform[] _shoulderBones;   // LeftShoulder, RightShoulder
+        private Transform[] _armBones;        // LeftUpperArm, RightUpperArm, LeftLowerArm, RightLowerArm
+        private Transform[] _upperLegBones;   // LeftUpperLeg, RightUpperLeg
+        private Transform[] _lowerLegBones;   // LeftLowerLeg, RightLowerLeg
+        private Transform[] _footBones;       // LeftFoot, RightFoot
 
-        public AvatarCustomizationService(Animator animator, IAvatarParameterRepository repository)
+        public AvatarCustomizationService(IAvatarParameterRepository repository)
         {
-            _animator = animator != null ? animator : throw new ArgumentNullException(nameof(animator));
             _currentScale = new BodyScale();
+        }
 
-            // すべてのボーンをキャッシュ
-            CacheBones();
+        /// <summary>
+        /// Animator (object型) を設定し、ボーンキャッシュと関連ボーン群を初期化します。
+        /// </summary>
+        public void SetAnimator(object animatorInstance)
+        {
+            _animator = animatorInstance;
+            var unityAnimator = _animator as Animator;
+            if (unityAnimator != null)
+            {
+                CacheBones(unityAnimator);
+                InitializeBoneGroups(unityAnimator);
+            }
+            else
+            {
+                if (animatorInstance != null)
+                {
+                    Debug.LogWarning("AvatarCustomizationService: Animator のキャストに失敗しました。");
+                }
+                _boneCache.Clear();
+                _torsoBones = null;
+                _headBones = null;
+                _shoulderBones = null;
+                _armBones = null;
+                _upperLegBones = null;
+                _lowerLegBones = null;
+                _footBones = null;
+            }
+        }
+
+        private void InitializeBoneGroups(Animator unityAnimator)
+        {
+            if (unityAnimator == null) return;
 
             // キャッシュを用いて各部位のボーン群を初期化
             _torsoBones = new Transform[]
@@ -82,14 +111,15 @@ namespace Infrastructure.Services
         /// <summary>
         /// Humanoidボーンをキャッシュします。
         /// </summary>
-        private void CacheBones()
+        private void CacheBones(Animator unityAnimator)
         {
-            if (_animator == null) return;
+            if (unityAnimator == null) return;
+            _boneCache.Clear();
 
             foreach (HumanBodyBones boneType in Enum.GetValues(typeof(HumanBodyBones)))
             {
                 if (boneType == HumanBodyBones.LastBone) continue;
-                var bone = _animator.GetBoneTransform(boneType);
+                var bone = unityAnimator.GetBoneTransform(boneType);
                 if (bone != null)
                 {
                     _boneCache[boneType] = bone;
@@ -111,7 +141,8 @@ namespace Infrastructure.Services
         /// </summary>
         public void ApplyBodyScale(BodyScale scale)
         {
-            if (_animator == null) return;
+            var unityAnimator = _animator as Animator;
+            if (unityAnimator == null) return;
             _currentScale = scale;
 
             ApplyHeight(scale.Height);
@@ -126,7 +157,8 @@ namespace Infrastructure.Services
         /// </summary>
         public void ApplyHeight(float height)
         {
-            if (_animator == null) return;
+            var unityAnimator = _animator as Animator;
+            if (unityAnimator == null) return;
             var hips = GetBone(HumanBodyBones.Hips);
             if (hips == null) return;
 
@@ -191,6 +223,7 @@ namespace Infrastructure.Services
         /// </summary>
         private float GetMinimumFootY()
         {
+            if (_footBones == null || _footBones.Length < 2) return float.MaxValue;
             float leftY = _footBones[0] != null ? _footBones[0].position.y : float.MaxValue;
             float rightY = _footBones[1] != null ? _footBones[1].position.y : float.MaxValue;
             return Mathf.Min(leftY, rightY);
@@ -243,7 +276,8 @@ namespace Infrastructure.Services
         /// </summary>
         public void ApplyBodyWidth(float width)
         {
-            if (_animator == null) return;
+            var unityAnimator = _animator as Animator;
+            if (unityAnimator == null) return;
 
             // 対象ボーンは hips と脚部の上部・下部
             var bonesToScale = new List<Transform>(
@@ -273,7 +307,8 @@ namespace Infrastructure.Services
         /// </summary>
         public void ApplyShoulderWidth(float width)
         {
-            if (_animator == null) return;
+            var unityAnimator = _animator as Animator;
+            if (unityAnimator == null) return;
 
             Transform[] upperBodyBones = new Transform[]
             {
@@ -310,6 +345,22 @@ namespace Infrastructure.Services
         public void ResetBodyScale()
         {
             ApplyBodyScale(new BodyScale());
+        }
+
+        /// <summary>
+        /// リソースを解放します。
+        /// </summary>
+        public void Dispose()
+        {
+            _animator = null;
+            _boneCache.Clear();
+            _torsoBones = null;
+            _headBones = null;
+            _shoulderBones = null;
+            _armBones = null;
+            _upperLegBones = null;
+            _lowerLegBones = null;
+            _footBones = null;
         }
     }
 }

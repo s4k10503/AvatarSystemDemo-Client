@@ -27,7 +27,8 @@ namespace UnitTests.Infrastructure
             _testGameObject = new GameObject("TestAvatarRoot");
             _testTransform = _testGameObject.transform;
 
-            _avatarCustomizationService = new AvatarCustomizationService(_mockAnimator, _mockRepository);
+            _avatarCustomizationService = new AvatarCustomizationService(_mockRepository);
+            _avatarCustomizationService.SetAnimator(_mockAnimator);
         }
 
         [TearDown]
@@ -37,16 +38,6 @@ namespace UnitTests.Infrastructure
             {
                 UnityEngine.Object.DestroyImmediate(_testGameObject); // Use DestroyImmediate in EditMode
             }
-        }
-
-        [Test]
-        public void コンストラクタ_Animatorがnullなら例外スロー()
-        {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                new AvatarCustomizationService(null, _mockRepository);
-            });
         }
 
         [Test]

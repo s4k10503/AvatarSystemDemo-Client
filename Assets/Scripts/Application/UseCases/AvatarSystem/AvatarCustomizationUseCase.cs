@@ -75,6 +75,24 @@ namespace Application.UseCases
         #region 公開メソッド
 
         /// <summary>
+        /// Animator (object型) をこのユースケースおよび関連サービスに設定します。
+        /// </summary>
+        /// <param name="animatorInstance">設定する Animator のインスタンス (object型)。</param>
+        public void InitializeAnimator(object animatorInstance)
+        {
+            _loggingService.Debug($"Animator (object) が AvatarCustomizationUseCase に設定されました: {animatorInstance != null}");
+
+            // AvatarCustomizationService に Animator を設定
+            _customizationService.SetAnimator(animatorInstance);
+
+            // AvatarSkinColorService に Animator を設定
+            _skinColorService.SetAnimator(animatorInstance);
+
+            // AvatarHairColorService に Animator を設定
+            _hairColorService.SetAnimator(animatorInstance);
+        }
+
+        /// <summary>
         /// アバターカスタマイズ機能を初期化します (リファクタリング版)
         /// </summary>
         /// <param name="isAuthenticated">ユーザーが認証済みかどうか</param>

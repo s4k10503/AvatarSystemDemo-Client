@@ -5,7 +5,7 @@ namespace Domain.Interfaces
     /// <summary>
     /// アバター体型カスタマイズサービスのインターフェース
     /// </summary>
-    public interface IAvatarCustomizationService
+    public interface IAvatarCustomizationService : IAnimatorSettable
     {
         void ApplyBodyScale(BodyScale scale);
         void ApplyHeight(float height);

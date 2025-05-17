@@ -17,9 +17,8 @@ namespace Infrastructure.Services
         /// <summary>
         /// コンストラクタ。
         /// </summary>
-        /// <param name="animator">アバターのアニメーター</param>
-        public AvatarSkinColorService(Animator animator)
-            : base(animator)
+        public AvatarSkinColorService()
+            : base()
         {
             _currentSkinColor = SkinColor.Default;
         }
@@ -61,11 +60,11 @@ namespace Infrastructure.Services
                                  materialNameLower.Contains("eyebase") ||
                                  materialNameLower.Contains("eyeline");
 
-                bool shaderMatch = (material.shader != null && material.shader.name.ToLower().Contains("skin"));
+                bool shaderMatch = material.shader != null && material.shader.name.ToLower().Contains("skin");
 
                 if (nameMatch || shaderMatch)
                 {
-                    return true; // Found a skin material by name/shader
+                    return true; // 肌色用のマテリアルを見つけた
                 }
             }
 
@@ -77,22 +76,23 @@ namespace Infrastructure.Services
 
                 if (material.HasProperty("_Color"))
                 {
-                    Color materialColor = material.color; // Get default color from shared material
+                    Color materialColor = material.color; // Get the color from the material
                     Color.RGBToHSV(materialColor, out float h, out float s, out float v);
 
-                    // Check if color is within typical skin tone ranges
+                    // コメントは日本語にして
+                    // Check if color is within typical skin tone ranges　
                     // 一般的な肌色は黄赤系（0-60度）で、彩度が低め～中程度
                     // (Adjusted range slightly: 0-60 degrees / 0.0-0.166f)
-                    bool hueMatch = (h <= 0.166f || h >= 0.9f); // Allows reds and oranges
-                    bool saturationMatch = s >= 0.1f && s <= 0.6f; // Broadened saturation slightly
-                    bool valueMatch = v > 0.2f; // Avoid very dark colors being mistaken for skin
+                    bool hueMatch = h <= 0.166f || h >= 0.9f; // 赤色とオレンジ色を許可
+                    bool saturationMatch = s >= 0.1f && s <= 0.6f; // 広げた彩度
+                    bool valueMatch = v > 0.2f; // 非常に暗い色を肌色と間違えないように
 
                     if (hueMatch && saturationMatch && valueMatch)
                     {
-                        // To avoid conflicts, ensure it doesn't also seem like hair (less likely but possible)
+                        // 競合を避けるため、髪のように見えないことを確認
                         if (!material.name.ToLower().Contains("hair"))
                         {
-                            return true; // Found a likely skin material by color
+                            return true; // 色で肌色のマテリアルを見つけた
                         }
                     }
                 }
@@ -107,7 +107,7 @@ namespace Infrastructure.Services
         protected override (Color firstShade, Color secondShade) CalculateShadeColors(Color baseColor)
         {
             Color.RGBToHSV(baseColor, out float h, out float s, out float v);
-            // Skin shades are typically subtle decreases in value
+            // 肌のシェードは典型的には値のわずかな減少
             Color firstShadeUnityColor = Color.HSVToRGB(h, s, Mathf.Clamp01(v * 0.98f));
             Color secondShadeUnityColor = Color.HSVToRGB(h, s, Mathf.Clamp01(v * 0.96f));
             return (firstShadeUnityColor, secondShadeUnityColor);
@@ -118,18 +118,18 @@ namespace Infrastructure.Services
         /// </summary>
         public void ApplyColor(SkinColor skinColor)
         {
-            if (_animator == null) return; // Keep basic guard
+            if (_animator == null) return; // 基本的なガードを維持
             _currentSkinColor = skinColor;
             ColorValue baseSkinColorValue = skinColor.Value;
 
-            // Convert Domain ColorValue to UnityEngine.Color for material application
+            // ドメインのColorValueをUnityEngine.Colorに変換してマテリアルに適用
             Color baseUnityColor = new(baseSkinColorValue.R, baseSkinColorValue.G, baseSkinColorValue.B, baseSkinColorValue.A);
 
-            // Call the base class method to apply colors
+            // ベースクラスのメソッドを呼び出して色を適用
             ApplyColorInternal(baseUnityColor);
 
-            // Apply to specific _SkinColor property if it exists (add-on to base logic)
-            foreach (var renderer in _renderers) // Use cached renderers from base
+            // 特定の_SkinColorプロパティが存在する場合は適用
+            foreach (var renderer in _renderers) // ベースからキャッシュされたレンダラーを使用
             {
                 if (renderer == null) continue;
                 foreach (var material in renderer.materials)
@@ -173,27 +173,27 @@ namespace Infrastructure.Services
         /// </summary>
         public async UniTask ApplyColorAsync(ColorValue color, IEnumerable<Renderer> renderers)
         {
-            _currentSkinColor = new SkinColor(color); // Update internal state if needed
+            _currentSkinColor = new SkinColor(color); // 必要な場合は内部状態を更新
 
-            // Call the base class async method first
+            // ベースクラスの非同期メソッドを最初に呼び出す
             await base.ApplyColorAsyncInternal(color, renderers);
 
-            // Apply to specific _SkinColor property if it exists (add-on to base logic)
+            // 特定の_SkinColorプロパティが存在する場合は適用
             Color baseUnityColor = new(color.R, color.G, color.B, color.A);
             if (renderers == null) return;
 
-            foreach (var renderer in renderers) // renderer is already of type Renderer here
+            foreach (var renderer in renderers) // rendererはすでにRenderer型です
             {
-                // IsTargetRenderer now accepts Renderer, so this check is fine.
-                // The specific type casting for SkinnedMeshRenderer is no longer needed here
-                // as IsTargetRenderer will be called by the base or this class's override.
+                // IsTargetRendererはRendererを受け取るようになったので、このチェックは問題ありません。
+                // 特定の型のキャストはもう必要ありません。
+                // IsTargetRendererはベースクラスかこのクラスのオーバーライドで呼び出されます。
                 if (renderer == null || !IsTargetRenderer(renderer))
                 {
                     continue;
                 }
 
-                // renderer.materials can be used for both SkinnedMeshRenderer and MeshRenderer
-                foreach (var material in renderer.materials) // Apply to instance materials
+                // renderer.materialsはSkinnedMeshRendererとMeshRendererの両方で使用できます
+                foreach (var material in renderer.materials) // インスタンスのマテリアルに適用
                 {
                     if (material == null) continue;
                     if (material.HasProperty("_SkinColor"))
@@ -202,7 +202,7 @@ namespace Infrastructure.Services
                     }
                 }
             }
-            // Base method already yields
+            // ベースメソッドはすでにyieldを返しています
         }
     }
 }

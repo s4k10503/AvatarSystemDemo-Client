@@ -17,8 +17,8 @@ namespace Infrastructure.Services
         /// <summary>
         /// コンストラクタ。
         /// </summary>
-        public AvatarHairColorService(Animator animator)
-            : base(animator)
+        public AvatarHairColorService()
+            : base()
         {
             _currentHairColor = HairColor.Default;
         }

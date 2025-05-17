@@ -8,9 +8,9 @@ using R3;
 
 using Domain.ValueObjects;
 using Application.UseCases;
+using Application.DTO;
 using Presentation.View;
 using Presentation.Interfaces;
-
 
 namespace Presentation.Presenter
 {
@@ -26,13 +26,18 @@ namespace Presentation.Presenter
         private readonly IPageManager _pageManager;
         private readonly CameraView _cameraView;
         private readonly AvatarSystemPage _avatarSystemPage;
-        private readonly GameObject _avatarRoot;
-        private readonly Animator _avatarAnimator;
+        private GameObject _avatarRoot;
+        private Animator _avatarAnimator;
+
+        [Header("Avatar Settings")]
+        [SerializeField] private string defaultAvatarPrefabName = "unitychan_dynamic Variant";
 
         private readonly AvatarCustomizationUseCase _customizationUseCase;
         private readonly LoginUseCase _loginUseCase;
+        private readonly AvatarLifecycleUseCase _avatarLifecycleUseCase;
 
         private bool _isInitializing = false;
+        private bool _avatarLoaded = false;
 
         private readonly CompositeDisposable _disposables = new();
         #endregion
@@ -44,31 +49,24 @@ namespace Presentation.Presenter
         public AvatarPresenter(
             CameraView cameraView,
             AvatarSystemPage avatarSystemPage,
-            GameObject avatarRoot,
+            AvatarLifecycleUseCase avatarLifecycleUseCase,
             AvatarCustomizationUseCase customizationUseCase,
             LoginUseCase loginUseCase,
-            IPageManager pageManager)
+            IPageManager pageManager
+            )
         {
             _cameraView = cameraView;
             _avatarSystemPage = avatarSystemPage;
-            _avatarRoot = avatarRoot;
+            _avatarLifecycleUseCase = avatarLifecycleUseCase;
             _customizationUseCase = customizationUseCase;
             _loginUseCase = loginUseCase;
             _pageManager = pageManager;
-            _avatarAnimator = avatarRoot.GetComponent<Animator>();
 
-            // 初期状態で非表示
-            _avatarRoot.SetActive(false);
 
             // DIの検証
             if (_cameraView == null)
             {
                 Debug.LogError("CameraView が注入されていません!");
-            }
-
-            if (_avatarRoot == null)
-            {
-                Debug.LogError("AvatarRoot が注入されていません!");
             }
 
             if (_avatarSystemPage == null)
@@ -93,6 +91,15 @@ namespace Presentation.Presenter
             _isInitializing = true;
             try
             {
+                bool avatarSetupSuccess = await TryLoadAndSetupAvatarAsync();
+
+                if (!avatarSetupSuccess)
+                {
+                    // アバターのセットアップに失敗した場合、必要に応じて追加のUIフィードバック
+                    return;
+                }
+
+                // アバターロード成功後の処理
                 // 認証状態とトークンを取得
                 bool isAuthenticated = _loginUseCase.IsAuthenticated();
                 string token = null;
@@ -124,7 +131,6 @@ namespace Presentation.Presenter
                     if (string.IsNullOrEmpty(userId))
                     {
                         Debug.LogWarning("ユーザーは認証されていますが、LoginUseCaseからUserIdを取得できませんでした。");
-                        // 必要に応じてここでログインページに戻るなどのエラー処理を追加
                     }
                 }
 
@@ -145,51 +151,120 @@ namespace Presentation.Presenter
                     );
                 }
 
-                // UIイベントの購読を開始
+                // UIイベントの購読
                 SubscribeToUIEvents();
 
-                // ボタン状態を更新 (UI更新後、イベント購読後)
+                // 保存ボタンの状態を更新
                 UpdateSaveButtonState();
 
-                // アバターに変更を適用 (UI更新後)
+                // アバターに変更を適用
                 _customizationUseCase.ApplyCustomization();
 
                 // アバターを表示
-                _avatarRoot.SetActive(true);
-                _cameraView.SetTarget(_avatarAnimator.transform);
+                if (_avatarRoot != null && _avatarAnimator != null)
+                {
+                    _avatarRoot.SetActive(true);
+                    _cameraView.SetTarget(_avatarAnimator.transform);
+                }
 
-                // カメラビューにアバター設定を伝える
+                // カメラビューに最新の設定を渡す（顔モード切替前に必ず最新の設定を反映）
                 _cameraView.UpdateAvatarSettings(initialSettings);
 
+                // カメラ回転イベントの購読
                 if (EventSystem.current == null)
                 {
                     var eventSystem = new GameObject("EventSystem");
                     eventSystem.AddComponent<EventSystem>();
                     eventSystem.AddComponent<StandaloneInputModule>();
                 }
-
-                // ボタン状態を更新 (UI更新後、イベント購読後)
-                UpdateSaveButtonState();
-
-                // アバターに変更を適用 (UI更新後)
-                _customizationUseCase.ApplyCustomization();
-
-                // カメラビューにアバター設定を伝える
-                _cameraView.UpdateAvatarSettings(initialSettings);
             }
             catch (OperationCanceledException)
             {
-                // キャンセル時の処理
+                Debug.LogWarning("Initialization was cancelled.");
             }
             catch (Exception ex)
             {
                 Debug.LogError($"アバターカスタマイズの初期化に失敗しました: {ex.Message}");
-                _avatarRoot.SetActive(true);
             }
             finally
             {
                 _isInitializing = false;
             }
+        }
+
+        /// <summary>
+        /// アバターのロードとセットアップを試行する。
+        /// 成功した場合は true を、失敗した場合は false を返す。
+        /// </summary>
+        private async UniTask<bool> TryLoadAndSetupAvatarAsync()
+        {
+            AvatarLoadResultDto loadResultDto;
+            try
+            {
+                loadResultDto = await _avatarLifecycleUseCase.LoadAndSetupAvatarAsync(defaultAvatarPrefabName);
+            }
+            catch (OperationCanceledException) // AvatarLifecycleUseCaseから再スローされる
+            {
+                // UseCase側でInfoログが出力済み。ここではfalseを返すのみ。
+                return false;
+            }
+            catch (Exception) // AvatarLifecycleUseCaseから再スローされる
+            {
+                // UseCase側でErrorログが出力済み。
+                return false;
+            }
+
+            if (!loadResultDto.IsSuccess)
+            {
+                // UseCase側でErrorログが出力済み (loadResultDto.ErrorMessage を含む)
+                return false;
+            }
+
+            if (loadResultDto.AvatarInstance is not GameObject go)
+            {
+                // UseCase側でErrorログが出力済みか、loadResultDto.ErrorMessage に詳細があるはず。
+                return false;
+            }
+
+            _avatarRoot = go;
+            // DTOからAnimatorの有無を取得
+            if (loadResultDto.HasAnimator)
+            {
+                _avatarAnimator = _avatarRoot.GetComponent<Animator>();
+                if (_avatarAnimator == null)
+                {
+                    // DTOではAnimatorありと報告されたが、GetComponentで取れなかった場合
+                    _avatarLifecycleUseCase.ReleaseAvatar(_avatarRoot);
+                    _avatarRoot = null;
+                    return false;
+                }
+            }
+            else
+            {
+                _avatarAnimator = null;
+                // Animatorがない場合、それが許容されるかどうかのロジックがここに入る
+                // 例えばAnimator必須ならエラーとしてfalseを返す
+                // ShowAvatarLoadErrorFeedback("Avatar loaded but does not have an Animator component as per DTO.");
+                // return false; // Animatorが必須の場合
+            }
+
+            _avatarLoaded = true;
+            _avatarRoot.SetActive(false); // 初期は非表示。表示はInitializeAsyncの後半で行う。
+
+            // Animator を AvatarCustomizationUseCase に設定
+            if (_avatarAnimator != null && _customizationUseCase != null)
+            {
+                // _customizationUseCase に Animator を設定するメソッドを呼び出す
+                // 例: _customizationUseCase.InitializeAnimator(_avatarAnimator);
+                // このメソッドは AvatarCustomizationUseCase に実装する必要があります。
+                // さらに AvatarCustomizationUseCase から AvatarCustomizationService へ、
+                // そして AvatarColorServiceBase を継承するクラスへと Animator が伝播される想定です。
+                // ここでは仮のメソッド名として InitializeAnimator を使用します。
+                // 実際のメソッド名に合わせてください。
+                _customizationUseCase.InitializeAnimator(_avatarAnimator);
+            }
+
+            return true; // セットアップ成功
         }
 
         /// <summary>
@@ -657,6 +732,15 @@ namespace Presentation.Presenter
         {
             // 全てのイベント購読を解除
             _disposables.Dispose();
+
+            // アバターリソースの解放
+            if (_avatarLoaded && _avatarRoot != null && _avatarLifecycleUseCase != null)
+            {
+                _avatarLifecycleUseCase.ReleaseAvatar(_avatarRoot);
+            }
+            _avatarRoot = null;
+            _avatarAnimator = null;
+            _avatarLoaded = false;
         }
     }
 }

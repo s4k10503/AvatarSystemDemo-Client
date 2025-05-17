@@ -8,5 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AvaterSystemScene.unity
     guid: dc6484afdeb0aa24aac9435226658f1f
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 56771188f8d7cd84ca7d0f449a7f8949,
+      type: 2}
   m_UseUCBPForAssetBundles: 0

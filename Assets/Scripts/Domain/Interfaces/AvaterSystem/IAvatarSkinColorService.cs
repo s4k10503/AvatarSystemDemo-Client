@@ -8,7 +8,7 @@ namespace Domain.Interfaces
     /// <summary>
     /// アバター肌色カスタマイズサービスのインターフェース
     /// </summary>
-    public interface IAvatarSkinColorService
+    public interface IAvatarSkinColorService : IAnimatorSettable
     {
         /// <summary>
         /// 肌の色を適用する

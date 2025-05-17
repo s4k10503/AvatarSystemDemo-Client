@@ -8,7 +8,7 @@ Unityでアバターシステムを実装するデモ
 - Firebaseによるバックエンド連携
 - ビルドターゲットはAndroidを想定
 
-https://github.com/user-attachments/assets/4cba010a-ec97-4509-bb4f-affaa771bf88
+<https://github.com/user-attachments/assets/4cba010a-ec97-4509-bb4f-affaa771bf88>
 
 ## 機能
 
@@ -39,7 +39,7 @@ https://github.com/user-attachments/assets/4cba010a-ec97-4509-bb4f-affaa771bf88
 
 ## アーキテクチャ
 
-VcotainerによるDI、R3によるリアクティブプログラミングなどを組み合わせて、関心の分離を実践
+VContainerによるDI、R3によるリアクティブプログラミングなどを組み合わせて、関心の分離を実践
 
 ```mermaid
 graph TD
@@ -127,6 +127,7 @@ graph TD
 
 ### その他
 
+- Addressables
 - VContainer
 - R3
 - UniTask
@@ -139,4 +140,4 @@ graph TD
 ## ライセンス
 
 - 同梱されているUnity Chanアセットのライセンスについては公式サイトを確認すること
-- 同梱されいるFirebase Unity SDKのライセンスについては公式サイトを確認すること
+- 同梱されているFirebase Unity SDKのライセンスについては公式サイトを確認すること

@@ -59,15 +59,12 @@ namespace Presentation.View
             _initialPosition = transform.position;
             _initialRotation = transform.rotation;
 
-            // 初期値を設定
-            _faceModeDistance = _initialDistance * faceModeDistanceRatio;
-            _currentFaceModeDistance = _faceModeDistance; // 初期化
-            _headOffset = new Vector3(0, 1.0f, 0);
-            _headPosition = _target.position + _headOffset;
-
-            // 高さ調整の初期値を設定
+            // カメラの初期高さを記録
             _initialCameraHeight = _initialPosition.y;
+            // 高さオフセットを初期化
             _currentHeightOffset = 0f;
+            // 頭部のデフォルトオフセットを初期化
+            _headOffset = new Vector3(0, 1.0f, 0);
         }
         #endregion
 
@@ -75,24 +72,27 @@ namespace Presentation.View
         /// <summary>
         /// ターゲットを設定
         /// </summary>
+        /// <param name="newTarget">新しいターゲット</param>
         public void SetTarget(Transform newTarget)
         {
             _target = newTarget;
             if (_target == null) return;
 
-            // 初期状態を保存
-            _initialPosition = transform.position;
+            // ターゲット基準の初期状態を保存
             _initialOffset = _initialPosition - _target.position;
             _initialDistance = new Vector2(_initialOffset.x, _initialOffset.z).magnitude;
-            _currentDistance = _initialDistance; // 初期化
+            _currentDistance = _initialDistance;
             _currentRotationAngle = 0f;
-            _initialRotation = transform.rotation;
 
-            // 初期値を設定
+            // 顔モード用の初期値を設定
             _faceModeDistance = _initialDistance * faceModeDistanceRatio;
-            _currentFaceModeDistance = _faceModeDistance; // 初期化
-            _headOffset = new Vector3(0, 1.0f, 0);
+            _currentFaceModeDistance = _faceModeDistance;
+
+            // 頭の位置を計算
             _headPosition = _target.position + _headOffset;
+
+            // ターゲット変更時に高さオフセットをリセット
+            _currentHeightOffset = 0f;
         }
 
         /// <summary>

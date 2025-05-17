@@ -19,15 +19,23 @@ namespace Presentation.Presenter
         private PageType _currentPage = PageType.Login;
         private readonly LoginPage _loginPage;
         private readonly AvatarSystemPage _avatarSystemPage;
+        private readonly RoomSystemPage _roomSystemPage;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
+        /// <param name="loginPage">ログインページ</param>
+        /// <param name="avatarSystemPage">アバターシステムページ</param>
+        /// <param name="roomSystemPage">ルームシステムページ</param>
         [Inject]
-        public PageManager(LoginPage loginPage, AvatarSystemPage avatarSystemPage)
+        public PageManager(
+            LoginPage loginPage,
+            AvatarSystemPage avatarSystemPage,
+            RoomSystemPage roomSystemPage)
         {
             _loginPage = loginPage;
             _avatarSystemPage = avatarSystemPage;
+            _roomSystemPage = roomSystemPage;
         }
 
         /// <summary>
@@ -40,11 +48,14 @@ namespace Presentation.Presenter
             // 各ページを登録
             RegisterPage(PageType.Login, _loginPage.gameObject);
             RegisterPage(PageType.AvatarSystem, _avatarSystemPage.gameObject);
+            RegisterPage(PageType.RoomSystem, _roomSystemPage.gameObject);
         }
 
         /// <summary>
         /// ページの登録
         /// </summary>
+        /// <param name="pageType">ページタイプ</param>
+        /// <param name="page">ページオブジェクト</param>
         public void RegisterPage(PageType pageType, GameObject page)
         {
             if (!_pages.ContainsKey(pageType))
@@ -61,6 +72,7 @@ namespace Presentation.Presenter
         /// <summary>
         /// ページ遷移
         /// </summary>
+        /// <param name="pageType">ページタイプ</param>
         public void NavigateTo(PageType pageType)
         {
             Debug.Log($"NavigateTo が呼び出されました: {pageType}, 現在のページ: {_currentPage}");

@@ -13,6 +13,7 @@ namespace Presentation.Interfaces
     public enum PageType
     {
         Login,
-        AvatarSystem
+        AvatarSystem,
+        RoomSystem
     }
 }

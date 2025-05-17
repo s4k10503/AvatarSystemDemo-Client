@@ -16,11 +16,12 @@
     <Template src="project://database/Assets/Scripts/Presentation/View/AvatarSystem/SkinColorSelector.uxml" name="SkinColorSelector" />
     <Template src="project://database/Assets/Scripts/Presentation/View/AvatarSystem/HairColorSelector.uxml" name="HairColorSelector" />
 
-    <!-- === アクションボタン (ログアウト, リセット, 保存) === -->
+    <!-- === アクションボタン (ログアウト, リセット, 保存, ルーム) === -->
     <VisualElement name="reset-button-container" class="reset-button-container">
         <Button text="ログアウト" name="logout-button" class="reset-button" />
         <Button text="リセット" name="reset-button" class="reset-button" />
         <Button text="保存" name="save-button" class="reset-button" />
+        <Button text="ルーム" name="navigate-to-room-button" class="reset-button" />
     </VisualElement>
 
     <!-- === メインカスタマイズコンテナ === -->

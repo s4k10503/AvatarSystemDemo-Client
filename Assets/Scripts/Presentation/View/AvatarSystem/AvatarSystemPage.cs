@@ -29,6 +29,7 @@ namespace Presentation.View
         private Button _resetButton;
         private Button _saveButton;
         private Button _logoutButton;
+        private Button _navigateToRoomButton;
         private VisualElement _contentContainer;
         private VisualElement _tabBarContainer;
         private VisualElement _tabBarScrollContent;
@@ -70,6 +71,7 @@ namespace Presentation.View
         private Subject<Unit> _resetRequestedSubject;
         private Subject<Unit> _saveRequestedSubject;
         private Subject<Unit> _logoutRequestedSubject;
+        private Subject<Unit> _navigateToRoomRequestedSubject;
         private Subject<Vector2> _nonUIPointerUpSubject;
         private Subject<bool> _uiVisibilityChangedSubject;
         private Subject<int> _tabChangedSubject;
@@ -104,6 +106,8 @@ namespace Presentation.View
             => _saveRequestedSubject ??= new Subject<Unit>();
         public Observable<Unit> OnLogoutRequested
             => _logoutRequestedSubject ??= new Subject<Unit>();
+        public Observable<Unit> OnNavigateToRoomRequested
+            => _navigateToRoomRequestedSubject ??= new Subject<Unit>();
         public Observable<Vector2> OnNonUIPointerUp
             => _nonUIPointerUpSubject ??= new Subject<Vector2>();
         public Observable<bool> OnUIVisibilityChanged
@@ -168,6 +172,7 @@ namespace Presentation.View
             _resetRequestedSubject = new Subject<Unit>();
             _saveRequestedSubject = new Subject<Unit>();
             _logoutRequestedSubject = new Subject<Unit>();
+            _navigateToRoomRequestedSubject = new Subject<Unit>();
             _nonUIPointerUpSubject = new Subject<Vector2>();
             _uiVisibilityChangedSubject = new Subject<bool>();
             _tabChangedSubject = new Subject<int>();
@@ -408,6 +413,7 @@ namespace Presentation.View
             _resetButton = UIElementUtils.QueryAndCheck<Button>(root, elementName: "reset-button", context: this);
             _saveButton = UIElementUtils.QueryAndCheck<Button>(root, elementName: "save-button", context: this);
             _logoutButton = UIElementUtils.QueryAndCheck<Button>(root, elementName: "logout-button", context: this);
+            _navigateToRoomButton = UIElementUtils.QueryAndCheck<Button>(root, elementName: "navigate-to-room-button", context: this);
         }
 
         /// <summary>
@@ -523,6 +529,10 @@ namespace Presentation.View
                 new { Button = _logoutButton, Action = new Action(() => {
                     Debug.Log("[AvatarSystemPage] ログアウトボタンがクリックされました。");
                     _logoutRequestedSubject?.OnNext(Unit.Default);
+                }) },
+                new { Button = _navigateToRoomButton, Action = new Action(() => {
+                    Debug.Log("[AvatarSystemPage] ルームへ移動ボタンがクリックされました。");
+                    _navigateToRoomRequestedSubject?.OnNext(Unit.Default);
                 }) }
             };
 
@@ -878,7 +888,7 @@ namespace Presentation.View
             {
                 Debug.Log("[AvatarSystemPage] ボタンコンテナが見つからないため、個別のボタンを操作します。");
                 // 配列にまとめて操作
-                Button[] buttons = { _resetButton, _saveButton, _logoutButton };
+                Button[] buttons = { _resetButton, _saveButton, _logoutButton, _navigateToRoomButton };
                 foreach (var button in buttons)
                 {
                     if (button != null) button.style.display = displayStyle;
@@ -1062,6 +1072,7 @@ namespace Presentation.View
                 _resetRequestedSubject,
                 _saveRequestedSubject,
                 _logoutRequestedSubject,
+                _navigateToRoomRequestedSubject,
                 _nonUIPointerUpSubject,
                 _uiVisibilityChangedSubject,
                 _tabChangedSubject,

@@ -15,6 +15,16 @@ MonoBehaviour:
   m_GroupName: BuiltIn Assets
   m_GUID: 56d3a5555d426cb4c9f6a8df6cff6929
   m_SerializeEntries:
+  - m_GUID: 0c66fc4a45c1447298b658d5ec9625b9
+    m_Address: Room
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a28a8c797f4f83e4c93d7325689f1f05
+    m_Address: Stage
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a8382588ef0182b4bb964c8914a6f982
     m_Address: unitychan_dynamic Variant
     m_ReadOnly: 0

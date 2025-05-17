@@ -11,7 +11,6 @@
     <Template src="project://database/Assets/Scripts/Presentation/View/Common/SlidePadComponent.uxml" name="SlidePad" />
 
     <!-- スタイルシート -->
-    <!-- 注: RoomSystemPage.uss は提供されていません。スタイルが不完全な可能性があります -->
     <Style src="RoomSystemPage.uss" />
     <Style src="project://database/Assets/Scripts/Presentation/View/Common/CommonStyles.uss" />
 
@@ -19,8 +18,16 @@
     <VisualElement name="room-system-page-root" style="width: 100%; height: 100%;">
 
         <!-- スライドパッドコンポーネント -->
-        <!-- 注: 以下のインラインスタイルは理想的には RoomSystemPage.uss に移動すべきです -->
-        <Instance template="SlidePad" name="slide-pad-instance" style="position: absolute; bottom: 50px; left: 50px; width: 150px; height: 150px;" />
+        <Instance template="SlidePad" name="slide-pad-instance" class="room-slide-pad" />
+
+        <!-- ジャンプボタン -->
+        <Button name="jump-button" class="jump-button" text="ジャンプ" />
+
+        <!-- アクションボタンコンテナ -->
+        <VisualElement name="room-action-buttons" class="room-action-buttons-container">
+            <Button name="logout-button" text="ログアウト" class="room-common-button" />
+            <Button name="navigate-to-avatar-system-button" text="アバター設定" class="room-common-button" />
+        </VisualElement>
 
         <!-- === 他のルームシステムページのコンテンツ === -->
         <!-- (ルームシステムの他のUI要素をここに追加します) -->

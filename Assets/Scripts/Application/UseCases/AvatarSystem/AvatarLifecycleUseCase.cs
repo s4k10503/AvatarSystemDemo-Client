@@ -10,111 +10,178 @@ namespace Application.UseCases
 {
     public class AvatarLifecycleUseCase : IDisposable
     {
-        private readonly IAvatarLoader _avatarLoader;
+        private readonly IAssetLoader _assetLoader;
         private readonly ILogService _logService;
-        private CancellationTokenSource _cts;
+        private CancellationTokenSource _avatarLoadingCts;
+        private CancellationTokenSource _stageLoadingCts;
 
         /// <summary>
         /// AvatarLifecycleUseCaseのコンストラクタ
         /// </summary>
-        /// <param name="avatarLoader"></param>
+        /// <param name="assetLoader"></param>
         /// <param name="logService"></param>
-        public AvatarLifecycleUseCase(IAvatarLoader avatarLoader, ILogService logService)
+        public AvatarLifecycleUseCase(IAssetLoader assetLoader, ILogService logService)
         {
-            _avatarLoader = avatarLoader;
+            _assetLoader = assetLoader;
             _logService = logService;
         }
 
         /// <summary>
         /// アバターをロードして初期セットアップを行う
         /// </summary>
-        /// <param name="avatarId">アバターのID</param>
-        /// <returns>ロードされたアバターのインスタンス</returns>
-        public async UniTask<AvatarLoadResultDto> LoadAndSetupAvatarAsync(string avatarId)
+        /// <param name="avatarAddress">アバターのアドレス</param>
+        /// <returns>ロードされたアバターのインスタンス情報</returns>
+        public async UniTask<AvatarLoadResultDto> LoadAndSetupAvatarAsync(string avatarAddress)
         {
-            // 既存のCTSがあればキャンセルして新しいものを作成
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = new CancellationTokenSource();
-            var ct = _cts.Token;
+            _avatarLoadingCts?.Cancel();
+            _avatarLoadingCts?.Dispose();
+            _avatarLoadingCts = new CancellationTokenSource();
+            var ct = _avatarLoadingCts.Token;
 
-            DomainLoadResult domainResult;
+            AssetLoadResult<GameObject> loadResult;
             try
             {
-                domainResult = await _avatarLoader.LoadAvatarAsync(avatarId, ct);
+                loadResult = await _assetLoader.LoadAssetAsync<GameObject>(avatarAddress, ct);
             }
             catch (OperationCanceledException)
             {
-                _logService.Info($"アバターのロードが ID: {avatarId} でキャンセルされました (CancellationTokenSource 経由)。");
+                _logService.Info($"アバターのロードが ID: {avatarAddress} でキャンセルされました (CancellationTokenSource 経由)。");
                 throw;
             }
             catch (Exception ex)
             {
-                _logService.Error($"IAvatarLoader で ID {avatarId} で予期しないエラーが発生しました。", ex);
+                _logService.Error($"IAssetLoader でアバター ID {avatarAddress} のロード中に予期しないエラー。", ex);
                 throw;
             }
 
-            if (!domainResult.IsSuccess)
+            if (!loadResult.IsSuccess)
             {
-                _logService.Error($"アバター (domain) のロードに失敗しました ID: {avatarId}. 理由: {domainResult.ErrorMessage}");
-                return new AvatarLoadResultDto(null, false, false, domainResult.ErrorMessage);
+                _logService.Error($"アバター (AssetLoadResult) のロードに失敗 ID: {avatarAddress}. 理由: {loadResult.ErrorMessage}");
+                return new AvatarLoadResultDto(null, false, false, loadResult.ErrorMessage);
             }
 
-            if (domainResult.Payload is not GameObject go)
+            GameObject avatarInstance = loadResult.Payload;
+            if (avatarInstance == null)
             {
-                _logService.Error($"アバター (domain) が正常にロードされました ID: {avatarId} ですが、ペイロードが GameObject ではありません。");
-                return new AvatarLoadResultDto(domainResult.Payload, false, false, "ロードされたペイロードが有効な GameObject ではありません。");
+                _logService.Error($"アバター (AssetLoadResult) が正常にロードされました ID: {avatarAddress} ですが、ペイロードがnullです。");
+                return new AvatarLoadResultDto(null, false, false, "ロードされたペイロードがnullです。");
             }
 
-            bool hasAnimator = go.GetComponent<Animator>() != null;
-
-            if (!hasAnimator && true)
+            bool hasAnimator = avatarInstance.GetComponent<Animator>() != null;
+            if (!hasAnimator)
             {
-                _logService.Warning($"アバター ID: {avatarId} がロードされましたが、UseCaseでGetComponent<Animator>() が失敗しました。これは、ローダーが Animator を保証する場合には予期しないことです。");
+                _logService.Error($"アバター ID: {avatarAddress} にはAnimatorコンポーネントが必須ですが、見つかりませんでした。アセットを解放します。");
+                _assetLoader.UnloadAsset(avatarInstance);
+                return new AvatarLoadResultDto(null, false, false, $"アバター ID: {avatarAddress} にAnimatorコンポーネントが見つかりません。");
             }
 
-            _logService.Info($"アバター (GameObject) が正常に処理されました ID: {avatarId}. HasAnimator: {hasAnimator}");
-            return new AvatarLoadResultDto(go, hasAnimator, true, null);
+            _logService.Info($"アバターが正常に処理されました ID: {avatarAddress}. HasAnimator: {hasAnimator}");
+            return new AvatarLoadResultDto(avatarInstance, hasAnimator, true, null);
         }
 
         /// <summary>
-        /// アバターを解放する
+        /// ステージをロードしてセットアップする
         /// </summary>
-        /// <param name="avatarInstance">解放するアバターのインスタンス。</param>
+        /// <param name="stageAddress">ステージのアドレス</param>
+        /// <returns>ロードされたステージのインスタンス情報</returns>
+        public async UniTask<StageLoadResultDto> LoadAndSetupStageAsync(string stageAddress)
+        {
+            _stageLoadingCts?.Cancel();
+            _stageLoadingCts?.Dispose();
+            _stageLoadingCts = new CancellationTokenSource();
+            var ct = _stageLoadingCts.Token;
+
+            AssetLoadResult<GameObject> loadResult;
+            try
+            {
+                loadResult = await _assetLoader.LoadAssetAsync<GameObject>(stageAddress, ct);
+            }
+            catch (OperationCanceledException)
+            {
+                _logService.Info($"ステージのロードが ID: {stageAddress} でキャンセルされました。");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logService.Error($"IAssetLoader でステージ ID {stageAddress} のロード中に予期しないエラー。", ex);
+                throw;
+            }
+
+            if (!loadResult.IsSuccess)
+            {
+                _logService.Error($"ステージ (AssetLoadResult) のロードに失敗 ID: {stageAddress}. 理由: {loadResult.ErrorMessage}");
+                return new StageLoadResultDto(null, false, loadResult.ErrorMessage);
+            }
+
+            GameObject stageInstance = loadResult.Payload;
+            if (stageInstance == null)
+            {
+                _logService.Error($"ステージ (AssetLoadResult) が正常にロードされました ID: {stageAddress} ですが、ペイロードがnullです。");
+                return new StageLoadResultDto(null, false, "ロードされたステージペイロードがnullです。");
+            }
+
+            _logService.Info($"ステージが正常に処理されました ID: {stageAddress}.");
+            return new StageLoadResultDto(stageInstance, true, null);
+        }
+
+        /// <summary>
+        /// アバターインスタンスを解放する
+        /// </summary>
         public void ReleaseAvatar(object avatarInstance)
         {
-            if (avatarInstance == null)
+            ReleaseAssetInternal(avatarInstance, "アバター");
+        }
+
+        /// <summary>
+        /// ステージインスタンスを解放する
+        /// </summary>
+        public void ReleaseStage(object stageInstance)
+        {
+            ReleaseAssetInternal(stageInstance, "ステージ");
+        }
+
+        /// <summary>
+        /// アセットを解放する内部メソッド
+        /// </summary>
+        /// <param name="assetInstance">解放するアセットのインスタンス</param>
+        /// <param name="assetType">アセットの型 (例: "アバター", "ステージ")</param>
+        private void ReleaseAssetInternal(object assetInstance, string assetType)
+        {
+            if (assetInstance == null)
             {
-                _logService.Warning("解放試行: アバターインスタンスがnullです。提供されませんでした。");
+                _logService.Warning($"解放試行: {assetType}インスタンスがnullです。");
                 return;
             }
 
-            string avatarIdentifier = "不明なアバター";
-            if (avatarInstance is GameObject go)
+            string identifier = "不明なアセット";
+            if (assetInstance is GameObject go)
             {
-                avatarIdentifier = $"GameObject '{go.name}' (InstanceID: {go.GetInstanceID()})";
+                identifier = $"GameObject '{go.name}' (InstanceID: {go.GetInstanceID()})";
+            }
+            else if (assetInstance is Component component)
+            {
+                identifier = $"Component '{component.GetType().Name}' on GameObject '{component.gameObject.name}' (InstanceID: {component.gameObject.GetInstanceID()})";
             }
             else
             {
-                // 他の型の場合、ToString() を使用するか、型情報を含める
-                avatarIdentifier = $"Instance of type '{avatarInstance.GetType().Name}' (ToString: {avatarInstance.ToString()})";
+                identifier = $"Instance of type '{assetInstance.GetType().Name}'";
             }
 
             try
             {
-                bool unloadedSuccessfully = _avatarLoader.UnloadAvatar(avatarInstance);
+                bool unloadedSuccessfully = _assetLoader.UnloadAsset(assetInstance);
                 if (unloadedSuccessfully)
                 {
-                    _logService.Info($"アバター ({avatarIdentifier}) の解放処理が正常に実行されました。");
+                    _logService.Info($"{assetType} ({identifier}) の解放処理が正常に実行されました。");
                 }
                 else
                 {
-                    _logService.Warning($"アバター ({avatarIdentifier}) の解放処理は実行されましたが、ローダーは成功を示しませんでした (またはインスタンスが無効でした)。");
+                    _logService.Warning($"{assetType} ({identifier}) の解放処理は実行されましたが、ローダーは成功を示しませんでした (またはインスタンスが無効でした)。");
                 }
             }
             catch (Exception ex)
             {
-                _logService.Error($"アバター ({avatarIdentifier}) の解放中に予期せぬエラーが発生しました。", ex);
+                _logService.Error($"{assetType} ({identifier}) の解放中に予期せぬエラー。", ex);
             }
         }
 
@@ -123,10 +190,22 @@ namespace Application.UseCases
         /// </summary>
         public void CancelAvatarLoading()
         {
-            if (_cts != null && !_cts.IsCancellationRequested)
+            if (_avatarLoadingCts != null && !_avatarLoadingCts.IsCancellationRequested)
             {
                 _logService.Info("アバターのロードをキャンセルします。");
-                _cts.Cancel();
+                _avatarLoadingCts.Cancel();
+            }
+        }
+
+        /// <summary>
+        /// 現在進行中のステージロード処理があればキャンセルします。
+        /// </summary>
+        public void CancelStageLoading()
+        {
+            if (_stageLoadingCts != null && !_stageLoadingCts.IsCancellationRequested)
+            {
+                _logService.Info("ステージのロードをキャンセルします。");
+                _stageLoadingCts.Cancel();
             }
         }
 
@@ -135,9 +214,13 @@ namespace Application.UseCases
         /// </summary>
         public void Dispose()
         {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = null;
+            _avatarLoadingCts?.Cancel();
+            _avatarLoadingCts?.Dispose();
+            _avatarLoadingCts = null;
+
+            _stageLoadingCts?.Cancel();
+            _stageLoadingCts?.Dispose();
+            _stageLoadingCts = null;
         }
     }
 }

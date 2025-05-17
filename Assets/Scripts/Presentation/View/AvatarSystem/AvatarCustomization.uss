@@ -246,6 +246,19 @@
     background-color: rgba(255, 80, 80, 0.85);
 }
 
+/* "ルーム" ボタンのスタイル */
+#navigate-to-room-button {
+    background-color: rgba(100, 200, 100, 0.9);
+}
+
+#navigate-to-room-button:hover {
+    background-color: rgba(120, 220, 120, 0.95);
+}
+
+#navigate-to-room-button:active {
+    background-color: rgba(80, 180, 80, 0.85);
+}
+
 /* ===================== */
 /* === 一般的なスタイル === */
 /* ===================== */

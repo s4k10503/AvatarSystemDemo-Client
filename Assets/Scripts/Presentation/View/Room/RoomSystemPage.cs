@@ -18,16 +18,28 @@ namespace Presentation.View
         // UI要素
         private VisualElement _slidePadBackgroundElement;
         private VisualElement _slidePadHandleElement;
+        private Button _jumpButton;
+        private Button _logoutButton;
+        private Button _navigateToAvatarSystemButton;
 
         // ロジックコンポーネント
         private SlidePadComponent _slidePadLogic;
 
         // Subject/Observable
-        private Subject<Vector2> _slidePadDirectionSubject;
-        public Observable<Vector2> OnSlidePadDirectionChanged => _slidePadDirectionSubject ??= new Subject<Vector2>();
+        private ReactiveProperty<Vector2> _slidePadDirectionProperty;
+        public ReadOnlyReactiveProperty<Vector2> SlidePadDirection
+            => _slidePadDirectionProperty ??= new ReactiveProperty<Vector2>(Vector2.zero);
 
-        private Subject<string> _logMessageSubject;
-        public Observable<string> OnLogMessage => _logMessageSubject ??= new Subject<string>();
+        private Subject<Unit> _jumpButtonClickedSubject;
+        public Observable<Unit> OnJumpButtonClicked
+            => _jumpButtonClickedSubject ??= new Subject<Unit>();
+
+        private Subject<Unit> _logoutRequestedSubject;
+        public Observable<Unit> OnLogoutRequested => _logoutRequestedSubject ??= new Subject<Unit>();
+
+        private Subject<Unit> _navigateToAvatarSystemRequestedSubject;
+        public Observable<Unit> OnNavigateToAvatarSystemRequested
+            => _navigateToAvatarSystemRequestedSubject ??= new Subject<Unit>();
 
         // 依存関係
         private IInputHandler _inputHandler;
@@ -43,11 +55,33 @@ namespace Presentation.View
         /// </summary>
         private void OnEnable()
         {
-            // コアコンポーネントの初期化
+            Initialize();
+            Debug.Log("[RoomSystemPage] 有効になりました。");
+        }
+
+        /// <summary>
+        /// 初期化処理を行います。
+        /// </summary>
+        private void Initialize()
+        {
+            InitializeFields();
+            InitializeUIElements();
+            SetupListeners();
+            InitializeDisposables();
+            SubscribeToObservables();
+        }
+
+        /// <summary>
+        /// フィールドの初期化
+        /// </summary>
+        private void InitializeFields()
+        {
             _disposables = new CompositeDisposable();
             _slidePadLogic = new SlidePadComponent();
-            _logMessageSubject = new Subject<string>();
-            _slidePadDirectionSubject = new Subject<Vector2>();
+            _slidePadDirectionProperty = (ReactiveProperty<Vector2>)SlidePadDirection;
+            _jumpButtonClickedSubject = (Subject<Unit>)OnJumpButtonClicked;
+            _logoutRequestedSubject = (Subject<Unit>)OnLogoutRequested;
+            _navigateToAvatarSystemRequestedSubject = (Subject<Unit>)OnNavigateToAvatarSystemRequested;
 
             // Input Handlerの初期化
             if (TryGetDocument())
@@ -55,7 +89,7 @@ namespace Presentation.View
                 try
                 {
                     _inputHandler = new UnityInputHandler(document);
-                    _logMessageSubject?.OnNext("[RoomSystemPage] InputHandler が初期化されました。");
+                    Debug.Log("[RoomSystemPage] InputHandler が初期化されました。");
                 }
                 catch (Exception ex)
                 {
@@ -68,20 +102,7 @@ namespace Presentation.View
                 Debug.LogError("[RoomSystemPage] UIDocument が見つかりません。InputHandler を初期化できません。", this);
                 _inputHandler = null;
             }
-
-            // InputHandlerが正常に作成された場合のみ続行
-            if (_inputHandler == null)
-            {
-                Debug.LogError("[RoomSystemPage] InputHandler が見つからないため、初期化を中止しました。", this);
-                return;
-            }
-
-            // UIとリスナーの初期化
-            InitializeAllUIElements(); // 最初にUI要素を検索
-            SetupAllListeners();       // 次にリスナーを設定
-
-            _initialized = true;
-            _logMessageSubject?.OnNext("[RoomSystemPage] 有効になりました。");
+            _initialized = false; // Mimicking AvatarSystemPage
         }
 
         /// <summary>
@@ -99,13 +120,21 @@ namespace Presentation.View
         /// <summary>
         /// 全てのUI要素の初期化
         /// </summary>
-        private void InitializeAllUIElements()
+        private void InitializeUIElements()
         {
-            if (!TryGetDocument()) return;
+            if (!TryGetDocument() || _inputHandler == null) // InputHandlerも必須
+            {
+                Debug.LogError("[RoomSystemPage] UI要素の初期化に必要なコンポーネントが不足しています。", this);
+                _initialized = true; // Set true even if failing to prevent issues if part of UI is up
+                return;
+            }
 
             InitializeSlidePadElements();
+            InitializeJumpButton();
+            InitializeAdditionalButtons();
 
             // TODO: RoomSystemPageの他のUI要素をここで初期化
+            _initialized = true; // Mimicking AvatarSystemPage
         }
 
         /// <summary>
@@ -130,7 +159,7 @@ namespace Presentation.View
             if (_slidePadLogic != null && _slidePadBackgroundElement != null && _slidePadHandleElement != null)
             {
                 _slidePadLogic.SetElements(_slidePadBackgroundElement, _slidePadHandleElement);
-                _logMessageSubject?.OnNext("[RoomSystemPage] SlidePad要素がロジックに設定されました。");
+                Debug.Log("[RoomSystemPage] SlidePad要素がロジックに設定されました。");
             }
             else
             {
@@ -139,11 +168,47 @@ namespace Presentation.View
             }
         }
 
+        /// <summary>
+        /// ジャンプボタンの初期化
+        /// </summary>
+        private void InitializeJumpButton()
+        {
+            if (document == null || document.rootVisualElement == null) return;
+
+            var root = document.rootVisualElement;
+            _jumpButton = UIElementUtils.QueryAndCheck<Button>(root, elementName: "jump-button", context: this);
+
+            if (_jumpButton != null)
+            {
+                Debug.Log("[RoomSystemPage] ジャンプボタンが初期化されました。");
+            }
+        }
+
+        /// <summary>
+        /// 追加ボタン（ログアウト、アバター設定へ）の初期化
+        /// </summary>
+        private void InitializeAdditionalButtons()
+        {
+            if (document == null || document.rootVisualElement == null) return;
+            var root = document.rootVisualElement;
+
+            _logoutButton = UIElementUtils.QueryAndCheck<Button>(root, elementName: "logout-button", context: this);
+            _navigateToAvatarSystemButton = UIElementUtils.QueryAndCheck<Button>(root, elementName: "navigate-to-avatar-system-button", context: this);
+
+            if (_logoutButton != null)
+            {
+                Debug.Log("[RoomSystemPage] ログアウトボタンが初期化されました。");
+            }
+            if (_navigateToAvatarSystemButton != null)
+            {
+                Debug.Log("[RoomSystemPage] アバター設定へ移動ボタンが初期化されました。");
+            }
+        }
 
         /// <summary>
         /// 全てのリスナーの設定
         /// </summary>
-        private void SetupAllListeners()
+        private void SetupListeners()
         {
             // 要素とロジックが有効な場合にスライドパッドリスナーを設定
             if (_slidePadBackgroundElement != null && _slidePadHandleElement != null && _slidePadLogic != null)
@@ -152,8 +217,11 @@ namespace Presentation.View
             }
             else
             {
-                _logMessageSubject?.OnNext("[RoomSystemPage] 要素/ロジックが見つからないため、SlidePadリスナーのセットアップをスキップします。");
+                Debug.Log("[RoomSystemPage] 要素/ロジックが見つからないため、SlidePadリスナーのセットアップをスキップします。");
             }
+
+            // ボタンリスナーの設定
+            SetupButtonListeners();
 
             // TODO: RoomSystemPageの他のコントロールのリスナーをここで設定
         }
@@ -163,7 +231,7 @@ namespace Presentation.View
         /// </summary>
         private void SetupSlidePadListeners()
         {
-            // ガード節（SetupAllListenersでのチェックにより多少冗長）
+            // ガード節（SetupListenersでのチェックにより多少冗長）
             if (_slidePadBackgroundElement == null)
             {
                 Debug.LogError("[RoomSystemPage] スライドパッドリスナーを設定できません: 背景要素がnullです。", this);
@@ -183,7 +251,6 @@ namespace Presentation.View
             _slidePadLogic.OnRequestDragStart += HandleSlidePadDragStartRequest;
             _slidePadLogic.OnRequestDragEnd += HandleSlidePadDragEndRequest;
 
-
             // 背景要素へのコールバック登録
             // 既存のコールバックを最初にクリア
             _slidePadBackgroundElement.UnregisterCallback<PointerDownEvent>(_slidePadLogic.OnPointerDown);
@@ -196,16 +263,14 @@ namespace Presentation.View
             _slidePadBackgroundElement.RegisterCallback<PointerUpEvent>(_slidePadLogic.OnPointerUp);
             _slidePadBackgroundElement.RegisterCallback<PointerCaptureOutEvent>(_slidePadLogic.OnPointerCaptureOut);
 
-
             // スライドパッド方向変更の購読
-            // 購読前にSubjectが初期化されていることを確認（OnEnableで実行済み）
             Observable.EveryUpdate()
                 .Select(_ => _slidePadLogic.Direction)
                 .DistinctUntilChanged()
-                .Subscribe(direction => _slidePadDirectionSubject?.OnNext(direction))
+                .Subscribe(direction => _slidePadDirectionProperty.Value = direction)
                 .AddTo(_disposables);
 
-            _logMessageSubject?.OnNext("[RoomSystemPage] SlidePadリスナーの設定が完了しました。");
+            Debug.Log("[RoomSystemPage] SlidePadリスナーの設定が完了しました。");
         }
 
         /// <summary>
@@ -242,7 +307,7 @@ namespace Presentation.View
             // 他のドラッグがグローバルに進行中かどうかを確認
             if (_inputHandler.IsDragging.CurrentValue)
             {
-                _logMessageSubject?.OnNext("[RoomSystemPage] スライドパッドのドラッグリクエストは無視されました: 他のドラッグが進行中です。");
+                Debug.Log("[RoomSystemPage] スライドパッドのドラッグリクエストは無視されました: 他のドラッグが進行中です。");
                 return;
             }
 
@@ -254,13 +319,13 @@ namespace Presentation.View
             if (!backgroundElement.HasPointerCapture(PointerId.mousePointerId))
             {
                 backgroundElement.CapturePointer(PointerId.mousePointerId); // 現時点ではマウス/タッチ0を想定
-                _logMessageSubject?.OnNext("[RoomSystemPage] スライドパッドのポインターがキャプチャされました。");
+                Debug.Log("[RoomSystemPage] スライドパッドのポインターがキャプチャされました。");
             }
             else
             {
-                _logMessageSubject?.OnNext("[RoomSystemPage] スライドパッドのポインターは既にキャプチャされています。");
+                Debug.Log("[RoomSystemPage] スライドパッドのポインターは既にキャプチャされています。");
             }
-            _logMessageSubject?.OnNext("[RoomSystemPage] スライドパッドのドラッグが開始されました (InputHandler経由)。");
+            Debug.Log("[RoomSystemPage] スライドパッドのドラッグが開始されました (InputHandler経由)。");
         }
 
         /// <summary>
@@ -274,23 +339,70 @@ namespace Presentation.View
                 return;
             }
 
-            // Check if we were actually dragging the slide pad
-            // Drag end is handled internally by InputHandler on pointer up.
-            // We might not need to explicitly call StopDragging or similar here anymore.
-            // Just ensure the SlidePadComponent resets its internal state.
+            // スライドパッドが実際にドラッグされていたかを確認
+            // ドラッグ終了はポインターアップ時にInputHandler内部で処理される
+            // SlidePadComponentの内部状態がリセットされることだけ確認する
             if (_inputHandler.DraggingElement == _slidePadBackgroundElement)
             {
                 // InputHandler.StopDragging(); // Obsolete and handled internally
-                _logMessageSubject?.OnNext("[RoomSystemPage] スライドパッドのドラッグが終了しました(内部処理)。");
+                Debug.Log("[RoomSystemPage] スライドパッドのドラッグが終了しました(内部処理)。");
             }
             else
             {
-                // Log if drag ended but wasn't the slide pad (might indicate an issue)
-                if (_inputHandler.IsDragging.CurrentValue) // Use .CurrentValue
+                // ドラッグが終了したがスライドパッドではなかった場合
+                if (_inputHandler.IsDragging.CurrentValue)
                 {
-                    _logMessageSubject?.OnNext("[RoomSystemPage] DragEndRequest受信時にスライドパッド以外の要素がドラッグ中でした。");
+                    Debug.Log("[RoomSystemPage] DragEndRequest受信時にスライドパッド以外の要素がドラッグ中でした。");
                 }
             }
+        }
+
+        /// <summary>
+        /// ボタンのリスナー設定
+        /// </summary>
+        private void SetupButtonListeners()
+        {
+            if (_jumpButton != null)
+            {
+                _jumpButton.clicked += () => _jumpButtonClickedSubject?.OnNext(Unit.Default);
+                Debug.Log("[RoomSystemPage] ジャンプボタンのリスナーが設定されました。");
+            }
+            else
+            {
+                Debug.LogWarning("[RoomSystemPage] ジャンプボタンが見つからないため、リスナーを設定できません。", this);
+            }
+
+            if (_logoutButton != null)
+            {
+                _logoutButton.clicked += () => _logoutRequestedSubject?.OnNext(Unit.Default);
+                Debug.Log("[RoomSystemPage] ログアウトボタンのリスナーが設定されました。");
+            }
+            else
+            {
+                Debug.LogWarning("[RoomSystemPage] ログアウトボタンが見つからないため、リスナーを設定できません。", this);
+            }
+
+            if (_navigateToAvatarSystemButton != null)
+            {
+                _navigateToAvatarSystemButton.clicked += () => _navigateToAvatarSystemRequestedSubject?.OnNext(Unit.Default);
+                Debug.Log("[RoomSystemPage] アバター設定へ移動ボタンのリスナーが設定されました。");
+            }
+            else
+            {
+                Debug.LogWarning("[RoomSystemPage] アバター設定へ移動ボタンが見つからないため、リスナーを設定できません。", this);
+            }
+        }
+
+        /// <summary>
+        /// 破棄可能オブジェクトを初期化します。
+        /// </summary>
+        private void InitializeDisposables()
+        {
+            _disposables ??= new CompositeDisposable();
+            _disposables.Add(_slidePadDirectionProperty);
+            _disposables.Add(_jumpButtonClickedSubject);
+            _disposables.Add(_logoutRequestedSubject);
+            _disposables.Add(_navigateToAvatarSystemRequestedSubject);
         }
 
         /// <summary>
@@ -298,20 +410,17 @@ namespace Presentation.View
         /// </summary>
         private void OnDisable()
         {
-            _logMessageSubject?.OnNext($"[RoomSystemPage] 無効化中。初期化済み: {_initialized}");
+            Debug.Log($"[RoomSystemPage] 無効化中。初期化済み: {_initialized}");
+            CleanupResources();
+            _initialized = false;
+            Debug.Log("[RoomSystemPage] 無効になりました。");
+        }
 
-            // 購読を破棄
-            _disposables?.Dispose();
-            _disposables = null;
-
-            // ロジックが存在する場合、SlidePadComponentイベントから手動で購読解除
-            if (_slidePadLogic != null)
-            {
-                _slidePadLogic.OnRequestDragStart -= HandleSlidePadDragStartRequest;
-                _slidePadLogic.OnRequestDragEnd -= HandleSlidePadDragEndRequest;
-            }
-
-            // UI要素に手動で追加されたコールバックを解除
+        /// <summary>
+        /// スライドパッドのコールバック登録解除
+        /// </summary>
+        private void UnregisterSlidePadCallbacks()
+        {
             if (_slidePadBackgroundElement != null && _slidePadLogic != null)
             {
                 try
@@ -323,16 +432,38 @@ namespace Presentation.View
                 }
                 catch (Exception ex)
                 {
-                    // 要素/ロジックが無効になった場合の登録解除中の潜在的なエラーをキャッチ
-                    Debug.LogWarning($"[RoomSystemPage] コールバック登録解除中にエラーが発生しました: {ex.Message}");
+                    Debug.LogWarning($"[RoomSystemPage] スライドパッドコールバック登録解除中にエラーが発生しました: {ex.Message}");
                 }
             }
+        }
 
-            _initialized = false;
+        /// <summary>
+        /// UI要素の参照をクリア
+        /// </summary>
+        private void ClearUIElementReferences()
+        {
             _slidePadBackgroundElement = null;
             _slidePadHandleElement = null;
+            _jumpButton = null;
+            _logoutButton = null;
+            _navigateToAvatarSystemButton = null;
+        }
 
-            _logMessageSubject?.OnNext("[RoomSystemPage] 無効になりました。");
+        /// <summary>
+        /// リソースのクリーンアップを行う共通メソッド
+        /// </summary>
+        private void CleanupResources()
+        {
+            _disposables?.Dispose();
+            _disposables = null;
+
+            if (_slidePadLogic != null)
+            {
+                _slidePadLogic.OnRequestDragStart -= HandleSlidePadDragStartRequest;
+                _slidePadLogic.OnRequestDragEnd -= HandleSlidePadDragEndRequest;
+            }
+            UnregisterSlidePadCallbacks();
+            ClearUIElementReferences();
         }
 
         /// <summary>
@@ -340,13 +471,23 @@ namespace Presentation.View
         /// </summary>
         private void OnDestroy()
         {
-            _disposables?.Dispose();
+            CleanupResources();
+            _slidePadLogic = null;
+            _inputHandler = null;
+        }
 
-            _logMessageSubject?.Dispose();
-            _slidePadDirectionSubject?.Dispose();
+        /// <summary>
+        /// Observableへの登録とイベント発行を行うメソッド群
+        /// </summary>
+        private void SubscribeToObservables()
+        {
+            if (!_initialized || _slidePadLogic == null || _inputHandler == null || _slidePadDirectionProperty == null)
+            {
+                Debug.LogWarning("[RoomSystemPage] SubscribeToObservablesの前提条件が満たされていません。処理をスキップします。", this);
+                return;
+            }
 
-            _logMessageSubject = null;
-            _slidePadDirectionSubject = null;
+            Debug.Log("[RoomSystemPage] Observableの購読を開始しました。(SubscribeToObservables)");
         }
     }
 }
